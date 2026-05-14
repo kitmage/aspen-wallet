@@ -11,6 +11,14 @@ if ( ! defined( 'ASPEN_WALLET_PRODUCT_GRANTS_NONCE' ) ) {
 	define( 'ASPEN_WALLET_PRODUCT_GRANTS_NONCE', 'aspen_wallet_product_grants_nonce' );
 }
 
+if ( ! defined( 'ASPEN_WALLET_ORDER_APPLIED_META_KEY' ) ) {
+	define( 'ASPEN_WALLET_ORDER_APPLIED_META_KEY', '_aspen_wallet_one_time_grants_applied' );
+}
+
+if ( ! defined( 'ASPEN_WALLET_ORDER_APPLIED_DETAILS_META_KEY' ) ) {
+	define( 'ASPEN_WALLET_ORDER_APPLIED_DETAILS_META_KEY', '_aspen_wallet_one_time_grants_applied_details' );
+}
+
 function aspen_wallet_register_woo_hooks() {
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		return;
@@ -21,6 +29,9 @@ function aspen_wallet_register_woo_hooks() {
 
 	add_action( 'woocommerce_variation_options', 'aspen_wallet_woo_render_variation_wallet_fields', 10, 3 );
 	add_action( 'woocommerce_save_product_variation', 'aspen_wallet_woo_save_variation_wallet_meta', 10, 2 );
+
+	add_action( 'woocommerce_order_status_completed', 'aspen_wallet_woo_apply_order_one_time_grants', 10, 1 );
+	add_action( 'woocommerce_payment_complete', 'aspen_wallet_woo_apply_order_one_time_grants', 10, 1 );
 }
 
 function aspen_wallet_get_grant_types() {
@@ -84,6 +95,125 @@ function aspen_wallet_woo_normalize_grants( $raw_grants ) {
 	}
 
 	return array_values( $valid );
+}
+
+function aspen_wallet_woo_get_resolved_item_grants( $item ) {
+	if ( ! $item instanceof WC_Order_Item_Product ) {
+		return array();
+	}
+
+	$product_id   = $item->get_product_id();
+	$variation_id = $item->get_variation_id();
+
+	if ( $variation_id > 0 ) {
+		$variation_grants = aspen_wallet_woo_get_product_grants( $variation_id );
+		if ( ! empty( $variation_grants ) ) {
+			return $variation_grants;
+		}
+	}
+
+	if ( $product_id > 0 ) {
+		return aspen_wallet_woo_get_product_grants( $product_id );
+	}
+
+	return array();
+}
+
+function aspen_wallet_woo_resolve_order_user_id( $order ) {
+	if ( ! $order instanceof WC_Order ) {
+		return 0;
+	}
+
+	$user_id = (int) $order->get_user_id();
+	if ( $user_id > 0 ) {
+		return $user_id;
+	}
+
+	$customer_id = (int) $order->get_customer_id();
+	if ( $customer_id > 0 ) {
+		return $customer_id;
+	}
+
+	$billing_email = sanitize_email( (string) $order->get_billing_email() );
+	if ( '' !== $billing_email ) {
+		$user = get_user_by( 'email', $billing_email );
+		if ( $user instanceof WP_User ) {
+			return (int) $user->ID;
+		}
+	}
+
+	return 0;
+}
+
+function aspen_wallet_woo_apply_order_one_time_grants( $order_id ) {
+	$order_id = absint( $order_id );
+	if ( $order_id <= 0 ) {
+		return;
+	}
+
+	$order = wc_get_order( $order_id );
+	if ( ! $order instanceof WC_Order ) {
+		return;
+	}
+
+	if ( 'yes' === $order->get_meta( ASPEN_WALLET_ORDER_APPLIED_META_KEY, true ) ) {
+		return;
+	}
+
+	$user_id = aspen_wallet_woo_resolve_order_user_id( $order );
+	if ( $user_id <= 0 ) {
+		$order->add_order_note( __( 'Aspen Wallet: skipped one-time grants (no mapped WordPress user).', 'aspen-wallet' ) );
+		$order->update_meta_data( ASPEN_WALLET_ORDER_APPLIED_META_KEY, 'no_user' );
+		$order->save();
+		return;
+	}
+
+	$applied = array();
+
+	foreach ( $order->get_items( 'line_item' ) as $item_id => $item ) {
+		$grants = aspen_wallet_woo_get_resolved_item_grants( $item );
+		if ( empty( $grants ) ) {
+			continue;
+		}
+
+		foreach ( $grants as $grant ) {
+			$bucket = isset( $grant['bucket'] ) ? aspen_wallet_sanitize_bucket_slug( $grant['bucket'] ) : '';
+			$amount = isset( $grant['amount'] ) ? absint( $grant['amount'] ) : 0;
+			$type   = isset( $grant['type'] ) ? sanitize_key( $grant['type'] ) : '';
+
+			if ( 'one_time_grant' !== $type || '' === $bucket || $amount <= 0 ) {
+				continue;
+			}
+
+			if ( wallet_add_balance( $user_id, $bucket, $amount ) ) {
+				$applied[] = array(
+					'item_id' => absint( $item_id ),
+					'bucket'  => $bucket,
+					'amount'  => $amount,
+				);
+			}
+		}
+	}
+
+	if ( empty( $applied ) ) {
+		$order->add_order_note( __( 'Aspen Wallet: no one-time grants found for this order.', 'aspen-wallet' ) );
+	} else {
+		$summary_parts = array();
+		foreach ( $applied as $entry ) {
+			$summary_parts[] = sprintf( '%s +%d', $entry['bucket'], $entry['amount'] );
+		}
+
+		/* translators: 1: user ID, 2: comma-separated grant summary. */
+		$order->add_order_note( sprintf( __( 'Aspen Wallet: applied one-time grants to user #%1$d (%2$s).', 'aspen-wallet' ), $user_id, implode( ', ', $summary_parts ) ) );
+	}
+
+	$order->update_meta_data( ASPEN_WALLET_ORDER_APPLIED_META_KEY, 'yes' );
+	$order->update_meta_data( ASPEN_WALLET_ORDER_APPLIED_DETAILS_META_KEY, $applied );
+	$order->save();
+
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		error_log( 'Aspen Wallet order ' . $order_id . ' one-time grants applied. User=' . $user_id . ' Applied=' . wp_json_encode( $applied ) );
+	}
 }
 
 function aspen_wallet_woo_render_product_wallet_fields() {
