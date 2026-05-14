@@ -96,6 +96,7 @@ function aspen_wallet_render_fluent_booking_event_wallet_settings( $event ) {
 			<label for="aspen-wallet-credit-cost"><?php esc_html_e( 'Credit Cost (int)', 'aspen-wallet' ); ?></label>
 			<input id="aspen-wallet-credit-cost" type="number" min="0" step="1" name="aspen_wallet_credit_cost" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" />
 		</p>
+		<?php wp_nonce_field( 'aspen_wallet_save_fluent_booking_event_settings', 'aspen_wallet_fb_nonce' ); ?>
 		<p>
 			<label for="aspen-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Buckets (ordered)', 'aspen-wallet' ); ?></label>
 			<select id="aspen-wallet-allowed-buckets" name="aspen_wallet_allowed_buckets[]" multiple="multiple">
@@ -115,6 +116,11 @@ function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $pay
 
 	$event_id = (int) $event_id;
 	if ( $event_id <= 0 ) {
+		return;
+	}
+
+	$nonce = isset( $payload['aspen_wallet_fb_nonce'] ) ? sanitize_text_field( wp_unslash( $payload['aspen_wallet_fb_nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'aspen_wallet_save_fluent_booking_event_settings' ) ) {
 		return;
 	}
 
