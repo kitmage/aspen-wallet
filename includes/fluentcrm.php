@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function aspen_wallet_register_fluentcrm_hooks() {
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'admin_notices', 'aspen_wallet_fluentcrm_debug_admin_notice' );
 }
 
@@ -29,6 +30,12 @@ function aspen_wallet_fluentcrm_debug_log( $message, $context = array() ) {
 }
 
 function aspen_wallet_fluentcrm_register_profile_section() {
+	static $registered = false;
+
+	if ( $registered ) {
+		return;
+	}
+
 	if ( ! function_exists( 'FluentCrmApi' ) ) {
 		aspen_wallet_fluentcrm_debug_log( 'Skipped section registration: FluentCrmApi() not available.' );
 		return;
@@ -36,7 +43,13 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 
 	$extender = FluentCrmApi( 'extender' );
 	if ( ! $extender || ! method_exists( $extender, 'addProfileSection' ) ) {
-		aspen_wallet_fluentcrm_debug_log( 'Skipped section registration: extender API unavailable.' );
+		aspen_wallet_fluentcrm_debug_log(
+			'Skipped section registration: extender API unavailable.',
+			array(
+				'extender_type' => is_object( $extender ) ? get_class( $extender ) : gettype( $extender ),
+				'has_add_profile_section' => is_object( $extender ) ? method_exists( $extender, 'addProfileSection' ) : false,
+			)
+		);
 		return;
 	}
 
@@ -46,6 +59,8 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 		'aspen_wallet_fluentcrm_profile_section_callback',
 		3
 	);
+
+	$registered = true;
 
 	aspen_wallet_fluentcrm_debug_log( 'Registered Wallet profile section.', array( 'priority' => 3 ) );
 }
