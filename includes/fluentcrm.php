@@ -10,8 +10,14 @@ function aspen_wallet_register_fluentcrm_hooks() {
 
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_fallback_hooks', 30 );
+}
 
-	// Fallback hooks remain registered, but self-disable when Extender profile API is available.
+function aspen_wallet_fluentcrm_register_fallback_hooks() {
+	if ( aspen_wallet_fluentcrm_has_extender_profile_api() ) {
+		return;
+	}
+
 	add_filter( 'fluentcrm_profile_nav', 'aspen_wallet_fluentcrm_fallback_register_wallet_nav' );
 	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_fallback_register_wallet_section' );
 	add_action( 'fluentcrm_profile_section_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
