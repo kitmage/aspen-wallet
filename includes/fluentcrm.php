@@ -35,28 +35,68 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 }
 
 function aspen_wallet_fluentcrm_fallback_register_wallet_nav( $nav ) {
+	$sample_item = array();
+	if ( is_array( $nav ) && isset( $nav[0] ) && is_array( $nav[0] ) ) {
+		$sample_item = $nav[0];
+	} elseif ( is_array( $nav ) ) {
+		$first = reset( $nav );
+		if ( is_array( $first ) ) {
+			$sample_item = $first;
+		}
+	}
+
 	if ( ! is_array( $nav ) ) {
 		$nav = array();
 	}
 
-	$nav[] = array(
+	$wallet_item = $sample_item;
+	$wallet_item = array_merge( $wallet_item, array(
+		'key'      => 'wallet',
 		'slug'     => 'wallet',
 		'title'    => __( 'Wallet', 'aspen-wallet' ),
+		'label'    => __( 'Wallet', 'aspen-wallet' ),
+		'name'     => __( 'Wallet', 'aspen-wallet' ),
+		'hash'     => 'wallet',
+		'route'    => 'wallet',
+		'path'     => 'wallet',
+		'url'      => 'wallet',
 		'priority' => 80,
-	);
+	) );
+
+	$nav[] = $wallet_item;
 
 	return $nav;
 }
 
 function aspen_wallet_fluentcrm_fallback_register_wallet_section( $sections ) {
+	$sample_section = array();
+	if ( is_array( $sections ) && isset( $sections[0] ) && is_array( $sections[0] ) ) {
+		$sample_section = $sections[0];
+	} elseif ( is_array( $sections ) ) {
+		$first = reset( $sections );
+		if ( is_array( $first ) ) {
+			$sample_section = $first;
+		}
+	}
+
 	if ( ! is_array( $sections ) ) {
 		$sections = array();
 	}
 
-	$sections[] = array(
+	$wallet_section = $sample_section;
+	$wallet_section = array_merge( $wallet_section, array(
+		'key'   => 'wallet',
 		'slug'  => 'wallet',
 		'title' => __( 'Wallet', 'aspen-wallet' ),
-	);
+		'label' => __( 'Wallet', 'aspen-wallet' ),
+		'name'  => __( 'Wallet', 'aspen-wallet' ),
+		'hash'  => 'wallet',
+		'route' => 'wallet',
+		'path'  => 'wallet',
+		'url'   => 'wallet',
+	) );
+
+	$sections[] = $wallet_section;
 
 	return $sections;
 }
@@ -65,6 +105,9 @@ function aspen_wallet_fluentcrm_fallback_render_wallet_section( $subscriber = nu
 	$user_id = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
 	echo aspen_wallet_fluentcrm_render_wallet_html( $user_id, aspen_wallet_get_buckets() );
 }
+
+add_action( 'fluentcrm_profile_section_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
+add_action( 'fluentcrm_profile_sections_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
 
 function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
 	$content_arr = is_array( $content ) ? $content : array();
