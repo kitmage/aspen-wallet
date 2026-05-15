@@ -10,8 +10,7 @@ function aspen_wallet_register_fluentcrm_hooks() {
 
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_add_profile_tab', 20, 1 );
-	add_action( 'admin_enqueue_scripts', 'aspen_wallet_fluentcrm_enqueue_route_fix' );
+	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_remove_broken_wallet_tabs', 999, 1 );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -93,6 +92,23 @@ function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
  */
 function aspen_wallet_fluentcrm_enqueue_route_fix( $hook_suffix ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	// Intentionally left blank.
+}
+
+/**
+ * Remove legacy/broken Wallet custom tabs from FluentCRM nav.
+ *
+ * @param array $sections Profile section definitions.
+ * @return array
+ */
+function aspen_wallet_fluentcrm_remove_broken_wallet_tabs( $sections ) {
+	if ( ! is_array( $sections ) ) {
+		return $sections;
+	}
+
+	unset( $sections['wallet'] );
+	unset( $sections['aspen_wallet'] );
+
+	return $sections;
 }
 
 
