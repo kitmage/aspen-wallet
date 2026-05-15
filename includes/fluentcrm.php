@@ -11,6 +11,7 @@ function aspen_wallet_register_fluentcrm_hooks() {
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_add_profile_tab', 20, 1 );
+	add_action( 'admin_enqueue_scripts', 'aspen_wallet_fluentcrm_enqueue_route_fix' );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -84,8 +85,8 @@ function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
 	return $resolved_user_id;
 }
 
-function aspen_wallet_fluentcrm_enqueue_admin_nav_patch( $hook_suffix ) {
-	if ( ! is_admin() ) {
+function aspen_wallet_fluentcrm_enqueue_route_fix( $hook_suffix ) {
+	if ( 'admin_page_fluentcrm-admin' !== $hook_suffix ) {
 		return;
 	}
 
@@ -94,46 +95,55 @@ function aspen_wallet_fluentcrm_enqueue_admin_nav_patch( $hook_suffix ) {
 		return;
 	}
 
-	if ( 'admin_page_fluentcrm-admin' !== $hook_suffix ) {
-		return;
-	}
-
-	wp_register_script( 'aspen-wallet-fcrm-nav-patch', '', array(), '1.0.0', true );
-	wp_enqueue_script( 'aspen-wallet-fcrm-nav-patch' );
-	wp_add_inline_script( 'aspen-wallet-fcrm-nav-patch', aspen_wallet_fluentcrm_nav_patch_js() );
+	wp_register_script( 'aspen-wallet-fcrm-wallet-route', '', array(), '1.0.0', true );
+	wp_enqueue_script( 'aspen-wallet-fcrm-wallet-route' );
+	wp_add_inline_script( 'aspen-wallet-fcrm-wallet-route', aspen_wallet_fluentcrm_route_fix_js() );
 }
 
-function aspen_wallet_fluentcrm_nav_patch_js() {
+function aspen_wallet_fluentcrm_route_fix_js() {
 	return "(function () {\n"
-		. "\tvar PATCH_SELECTOR = 'a[href=\"#fluentcrm_sub_info_body\"],a[href=\"#/#fluentcrm_sub_info_body\"]';\n"
-		. "\tfunction getBaseHash() {\n"
+		. "\tfunction walletTargetHash() {\n"
 		. "\t\tvar hash = window.location.hash || '#/';\n"
-		. "\t\tif (hash.indexOf('#/') !== 0) {\n"
+		. "\t\tvar match = hash.match(/^#\\/subscribers\\/(\\d+)\\//);\n"
+		. "\t\tif (!match) {\n"
 		. "\t\t\treturn '#/';\n"
 		. "\t\t}\n"
-		. "\t\tvar nestedIndex = hash.indexOf('/#');\n"
-		. "\t\tif (nestedIndex !== -1) {\n"
-		. "\t\t\thash = hash.substring(0, nestedIndex + 1);\n"
-		. "\t\t}\n"
-		. "\t\tif (hash.charAt(hash.length - 1) !== '/') {\n"
-		. "\t\t\thash += '/';\n"
-		. "\t\t}\n"
-		. "\t\treturn hash;\n"
+		. "\t\treturn '#/subscribers/' + match[1] + '/aspen_wallet#fluentcrm_sub_info_body';\n"
 		. "\t}\n"
-		. "\tfunction patchWalletLink() {\n"
-		. "\t\tvar walletLink = document.querySelector(PATCH_SELECTOR);\n"
-		. "\t\tif (!walletLink) {\n"
+		. "\tfunction isWalletAnchor(link) {\n"
+		. "\t\tif (!link) {\n"
+		. "\t\t\treturn false;\n"
+		. "\t\t}\n"
+		. "\t\tvar text = (link.textContent || '').trim().toLowerCase();\n"
+		. "\t\tvar href = (link.getAttribute('href') || '').toLowerCase();\n"
+		. "\t\treturn text === 'wallet' || href.indexOf('aspen_wallet') !== -1;\n"
+		. "\t}\n"
+		. "\tfunction patchLink(link) {\n"
+		. "\t\tif (!isWalletAnchor(link)) {\n"
 		. "\t\t\treturn;\n"
 		. "\t\t}\n"
-		. "\t\twalletLink.setAttribute('href', getBaseHash() + '#fluentcrm_sub_info_body');\n"
+		. "\t\tvar target = walletTargetHash();\n"
+		. "\t\tif ('#/' === target) {\n"
+		. "\t\t\treturn;\n"
+		. "\t\t}\n"
+		. "\t\tlink.setAttribute('href', target);\n"
+		. "\t\tif (!link.dataset.aspenWalletRouteFixBound) {\n"
+		. "\t\t\tlink.addEventListener('click', function (event) {\n"
+		. "\t\t\t\tevent.preventDefault();\n"
+		. "\t\t\t\twindow.location.hash = target;\n"
+		. "\t\t\t});\n"
+		. "\t\t\tlink.dataset.aspenWalletRouteFixBound = '1';\n"
+		. "\t\t}\n"
 		. "\t}\n"
-		. "\tif (document.readyState === 'loading') {\n"
-		. "\t\tdocument.addEventListener('DOMContentLoaded', patchWalletLink);\n"
-		. "\t} else {\n"
-		. "\t\tpatchWalletLink();\n"
+		. "\tfunction applyPatch() {\n"
+		. "\t\tvar links = document.querySelectorAll('a');\n"
+		. "\t\tfor (var i = 0; i < links.length; i++) {\n"
+		. "\t\t\tpatchLink(links[i]);\n"
+		. "\t\t}\n"
 		. "\t}\n"
-		. "\twindow.addEventListener('hashchange', patchWalletLink);\n"
-		. "\tvar observer = new MutationObserver(patchWalletLink);\n"
+		. "\tapplyPatch();\n"
+		. "\twindow.addEventListener('hashchange', applyPatch);\n"
+		. "\tvar observer = new MutationObserver(applyPatch);\n"
 		. "\tobserver.observe(document.body, { childList: true, subtree: true });\n"
 		. "})();";
 }
