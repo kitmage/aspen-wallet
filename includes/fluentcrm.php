@@ -10,7 +10,7 @@ function aspen_wallet_register_fluentcrm_hooks() {
 
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_action( 'admin_footer', 'aspen_wallet_fluentcrm_fix_profile_nav_link' );
+	add_action( 'admin_enqueue_scripts', 'aspen_wallet_fluentcrm_enqueue_admin_nav_patch' );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -70,7 +70,7 @@ function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
 	return $resolved_user_id;
 }
 
-function aspen_wallet_fluentcrm_fix_profile_nav_link() {
+function aspen_wallet_fluentcrm_enqueue_admin_nav_patch( $hook_suffix ) {
 	if ( ! is_admin() ) {
 		return;
 	}
@@ -79,48 +79,49 @@ function aspen_wallet_fluentcrm_fix_profile_nav_link() {
 	if ( 'fluentcrm-admin' !== $page ) {
 		return;
 	}
-	?>
-	<script>
-		(function() {
-			function normalizeBaseHash(hashValue) {
-				if (!hashValue) {
-					return '#/';
-				}
-				var cleaned = hashValue.replace(/^#/, '');
-				if (!cleaned || cleaned === '/') {
-					return '#/';
-				}
-				var anchorIndex = cleaned.indexOf('#');
-				if (anchorIndex !== -1) {
-					cleaned = cleaned.substring(0, anchorIndex);
-				}
-				if (cleaned.charAt(0) !== '/') {
-					cleaned = '/' + cleaned;
-				}
-				if (cleaned.charAt(cleaned.length - 1) !== '/') {
-					cleaned += '/';
-				}
-				return '#' + cleaned;
-			}
 
-			function patchWalletLink() {
-				var walletLink = document.querySelector('a[href="#fluentcrm_sub_info_body"], a[href="#/#fluentcrm_sub_info_body"]');
-				if (!walletLink) {
-					return;
-				}
+	if ( 'admin_page_fluentcrm-admin' !== $hook_suffix ) {
+		return;
+	}
 
-				var hash = window.location.hash || '#/';
-				var baseHash = normalizeBaseHash(hash);
-				walletLink.setAttribute('href', baseHash + '#fluentcrm_sub_info_body');
-			}
+	wp_register_script( 'aspen-wallet-fcrm-nav-patch', '', array(), '1.0.0', true );
+	wp_enqueue_script( 'aspen-wallet-fcrm-nav-patch' );
+	wp_add_inline_script( 'aspen-wallet-fcrm-nav-patch', aspen_wallet_fluentcrm_nav_patch_js() );
+}
 
-			patchWalletLink();
-			window.addEventListener('hashchange', patchWalletLink);
-			setTimeout(patchWalletLink, 300);
-			setTimeout(patchWalletLink, 1000);
-		})();
-	</script>
-	<?php
+function aspen_wallet_fluentcrm_nav_patch_js() {
+	return "(function () {\n"
+		. "\tvar PATCH_SELECTOR = 'a[href=\"#fluentcrm_sub_info_body\"],a[href=\"#/#fluentcrm_sub_info_body\"]';\n"
+		. "\tfunction getBaseHash() {\n"
+		. "\t\tvar hash = window.location.hash || '#/';\n"
+		. "\t\tif (hash.indexOf('#/') !== 0) {\n"
+		. "\t\t\treturn '#/';\n"
+		. "\t\t}\n"
+		. "\t\tvar nestedIndex = hash.indexOf('/#');\n"
+		. "\t\tif (nestedIndex !== -1) {\n"
+		. "\t\t\thash = hash.substring(0, nestedIndex + 1);\n"
+		. "\t\t}\n"
+		. "\t\tif (hash.charAt(hash.length - 1) !== '/') {\n"
+		. "\t\t\thash += '/';\n"
+		. "\t\t}\n"
+		. "\t\treturn hash;\n"
+		. "\t}\n"
+		. "\tfunction patchWalletLink() {\n"
+		. "\t\tvar walletLink = document.querySelector(PATCH_SELECTOR);\n"
+		. "\t\tif (!walletLink) {\n"
+		. "\t\t\treturn;\n"
+		. "\t\t}\n"
+		. "\t\twalletLink.setAttribute('href', getBaseHash() + '#fluentcrm_sub_info_body');\n"
+		. "\t}\n"
+		. "\tif (document.readyState === 'loading') {\n"
+		. "\t\tdocument.addEventListener('DOMContentLoaded', patchWalletLink);\n"
+		. "\t} else {\n"
+		. "\t\tpatchWalletLink();\n"
+		. "\t}\n"
+		. "\twindow.addEventListener('hashchange', patchWalletLink);\n"
+		. "\tvar observer = new MutationObserver(patchWalletLink);\n"
+		. "\tobserver.observe(document.body, { childList: true, subtree: true });\n"
+		. "})();";
 }
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
