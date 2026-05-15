@@ -52,23 +52,22 @@ function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber 
 }
 
 function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
+	$resolved_user_id = 0;
+
 	if ( ! is_object( $subscriber ) ) {
-		return 0;
+		return $resolved_user_id;
 	}
 
 	if ( isset( $subscriber->user_id ) ) {
-		return (int) $subscriber->user_id;
+		$resolved_user_id = (int) $subscriber->user_id;
+	} elseif ( isset( $subscriber->wp_user_id ) ) {
+		$resolved_user_id = (int) $subscriber->wp_user_id;
+	} elseif ( method_exists( $subscriber, 'getUserId' ) ) {
+		$resolved_user_id = (int) $subscriber->getUserId();
 	}
 
-	if ( isset( $subscriber->wp_user_id ) ) {
-		return (int) $subscriber->wp_user_id;
-	}
-
-	if ( method_exists( $subscriber, 'getUserId' ) ) {
-		return (int) $subscriber->getUserId();
-	}
-
-	$nav[] = $wallet_item;
+	return $resolved_user_id;
+}
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
 	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fluentcrm_manage_contacts' ) ) {
