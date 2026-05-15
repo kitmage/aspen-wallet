@@ -8,11 +8,15 @@ function aspen_wallet_register_fluentcrm_hooks() {
 		return;
 	}
 
+	// FluentCRM has changed tab hook names across versions. Register all known variants.
 	add_filter( 'fluentcrm_contact_profile_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
 	add_filter( 'fluentcrm_contact_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
+	add_filter( 'fluentcrm_subscriber_profile_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
 
 	add_action( 'fluentcrm_contact_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 	add_action( 'fluentcrm_contact_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_subscriber_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_subscriber_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 }
 
 function aspen_wallet_fluentcrm_register_wallet_tab( $tabs ) {
@@ -34,6 +38,15 @@ function aspen_wallet_fluentcrm_get_contact( $contact ) {
 	}
 
 	$contact_id = isset( $_GET['contact_id'] ) ? aspen_wallet_to_int( $_GET['contact_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	if ( $contact_id <= 0 && isset( $_GET['subscriber_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$contact_id = aspen_wallet_to_int( $_GET['subscriber_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
+	if ( $contact_id <= 0 && isset( $_GET['id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$contact_id = aspen_wallet_to_int( $_GET['id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
 	if ( $contact_id <= 0 ) {
 		return null;
 	}
