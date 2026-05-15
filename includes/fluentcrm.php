@@ -28,7 +28,7 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 	}
 
 	$extender->addProfileSection(
-		'aspen_wallet',
+		'wallet',
 		__( 'Wallet', 'aspen-wallet' ),
 		'aspen_wallet_fluentcrm_profile_section_callback'
 	);
