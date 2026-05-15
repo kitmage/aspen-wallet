@@ -8,14 +8,88 @@ function aspen_wallet_register_fluentcrm_hooks() {
 		return;
 	}
 
+	// FluentCRM has changed tab hook names across versions. Register all known variants.
 	add_filter( 'fluentcrm_contact_profile_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
 	add_filter( 'fluentcrm_contact_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
+	add_filter( 'fluentcrm_subscriber_profile_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
+	add_filter( 'fluentcrm_profile_nav', 'aspen_wallet_fluentcrm_register_wallet_profile_nav' );
 
 	add_action( 'fluentcrm_contact_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 	add_action( 'fluentcrm_contact_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_subscriber_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_subscriber_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+
+	aspen_wallet_fluentcrm_debug_log( 'Registered FluentCRM wallet hooks.' );
+
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		add_action( 'all', 'aspen_wallet_fluentcrm_trace_runtime_hooks', 1 );
+	}
+}
+
+function aspen_wallet_fluentcrm_trace_runtime_hooks( $arg = null ) {
+	static $seen = array();
+	static $count = 0;
+
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	$hook = current_filter();
+	if ( ! is_string( $hook ) || '' === $hook ) {
+		return;
+	}
+
+	if ( false === strpos( $hook, 'fluentcrm' ) ) {
+		return;
+	}
+
+	if ( isset( $seen[ $hook ] ) ) {
+		return;
+	}
+
+	if ( $count >= 120 ) {
+		return;
+	}
+
+	$seen[ $hook ] = true;
+	++$count;
+
+	aspen_wallet_fluentcrm_debug_log(
+		'Observed FluentCRM runtime hook.',
+		array(
+			'hook'  => $hook,
+			'count' => $count,
+		)
+	);
+}
+
+function aspen_wallet_fluentcrm_debug_log( $message, $context = array() ) {
+	if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+		return;
+	}
+
+	if ( ! is_array( $context ) ) {
+		$context = array();
+	}
+
+	$payload = array(
+		'message' => (string) $message,
+		'context' => $context,
+	);
+
+	error_log( 'Aspen Wallet FluentCRM: ' . wp_json_encode( $payload ) );
 }
 
 function aspen_wallet_fluentcrm_register_wallet_tab( $tabs ) {
+	aspen_wallet_fluentcrm_debug_log(
+		'Wallet tab filter fired.',
+		array(
+			'hook'      => current_filter(),
+			'tabs_type' => gettype( $tabs ),
+		)
+	);
+
 	if ( ! is_array( $tabs ) ) {
 		$tabs = array();
 	}
@@ -28,13 +102,64 @@ function aspen_wallet_fluentcrm_register_wallet_tab( $tabs ) {
 	return $tabs;
 }
 
+function aspen_wallet_fluentcrm_register_wallet_profile_nav( $nav ) {
+	aspen_wallet_fluentcrm_debug_log(
+		'Profile nav filter fired.',
+		array(
+			'hook'     => current_filter(),
+			'nav_type' => gettype( $nav ),
+		)
+	);
+
+	if ( ! is_array( $nav ) ) {
+		$nav = array();
+	}
+
+	$wallet_item = array(
+		'slug'     => 'wallet',
+		'title'    => __( 'Wallet', 'aspen-wallet' ),
+		'hash'     => 'wallet',
+		'priority' => 80,
+	);
+
+	if ( isset( $nav['wallet'] ) && is_array( $nav['wallet'] ) ) {
+		$nav['wallet'] = array_merge( $wallet_item, $nav['wallet'] );
+		return $nav;
+	}
+
+	if ( isset( $nav[0] ) && is_array( $nav[0] ) ) {
+		$nav[] = $wallet_item;
+		return $nav;
+	}
+
+	$nav['wallet'] = $wallet_item;
+	return $nav;
+}
+
 function aspen_wallet_fluentcrm_get_contact( $contact ) {
 	if ( is_object( $contact ) ) {
 		return $contact;
 	}
 
 	$contact_id = isset( $_GET['contact_id'] ) ? aspen_wallet_to_int( $_GET['contact_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	if ( $contact_id <= 0 && isset( $_GET['subscriber_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$contact_id = aspen_wallet_to_int( $_GET['subscriber_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
+	if ( $contact_id <= 0 && isset( $_GET['id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$contact_id = aspen_wallet_to_int( $_GET['id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	}
+
 	if ( $contact_id <= 0 ) {
+		aspen_wallet_fluentcrm_debug_log(
+			'No contact id found from request.',
+			array(
+				'contact_id'    => isset( $_GET['contact_id'] ) ? aspen_wallet_to_int( $_GET['contact_id'] ) : 0, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				'subscriber_id' => isset( $_GET['subscriber_id'] ) ? aspen_wallet_to_int( $_GET['subscriber_id'] ) : 0, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				'id'            => isset( $_GET['id'] ) ? aspen_wallet_to_int( $_GET['id'] ) : 0, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			)
+		);
 		return null;
 	}
 
@@ -81,6 +206,7 @@ function aspen_wallet_fluentcrm_render_wallet_tab( $contact = null ) {
 	}
 
 	if ( ! $contact ) {
+		aspen_wallet_fluentcrm_debug_log( 'Wallet render failed: contact not found.', array( 'hook' => current_filter() ) );
 		echo '<p>' . esc_html__( 'Unable to load FluentCRM contact.', 'aspen-wallet' ) . '</p>';
 		return;
 	}
