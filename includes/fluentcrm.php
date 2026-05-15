@@ -4,14 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function aspen_wallet_register_fluentcrm_hooks() {
-	if ( ! defined( 'FLUENTCRM' ) || ! function_exists( 'FluentCrmApi' ) ) {
-		return;
-	}
-
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 }
 
 function aspen_wallet_fluentcrm_register_profile_section() {
+	if ( ! function_exists( 'FluentCrmApi' ) ) {
+		return;
+	}
+
 	$extender = FluentCrmApi( 'extender' );
 	if ( ! $extender || ! method_exists( $extender, 'addProfileSection' ) ) {
 		return;
@@ -20,7 +20,8 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 	$extender->addProfileSection(
 		'aspen_wallet',
 		__( 'Wallet', 'aspen-wallet' ),
-		'aspen_wallet_fluentcrm_profile_section_callback'
+		'aspen_wallet_fluentcrm_profile_section_callback',
+		3
 	);
 }
 
