@@ -100,11 +100,22 @@ function aspen_wallet_fluentcrm_register_wallet_profile_nav( $nav ) {
 }
 
 function aspen_wallet_fluentcrm_register_wallet_profile_section( $sections ) {
+	$sample_section = array();
+	if ( is_array( $sections ) && isset( $sections[0] ) && is_array( $sections[0] ) ) {
+		$sample_section = $sections[0];
+	} elseif ( is_array( $sections ) ) {
+		$first = reset( $sections );
+		if ( is_array( $first ) ) {
+			$sample_section = $first;
+		}
+	}
+
 	aspen_wallet_fluentcrm_debug_log(
 		'Profile sections filter fired.',
 		array(
-			'hook'          => current_filter(),
-			'sections_type' => gettype( $sections ),
+			'hook'                 => current_filter(),
+			'sections_type'        => gettype( $sections ),
+			'sample_section_keys'  => array_keys( $sample_section ),
 		)
 	);
 
@@ -112,17 +123,24 @@ function aspen_wallet_fluentcrm_register_wallet_profile_section( $sections ) {
 		$sections = array();
 	}
 
-	$wallet_section = array(
-		'key'      => 'wallet',
-		'label'    => __( 'Wallet', 'aspen-wallet' ),
-		'title'    => __( 'Wallet', 'aspen-wallet' ),
-		'slug'     => 'wallet',
-		'name'     => __( 'Wallet', 'aspen-wallet' ),
-		'priority' => 80,
-		'hash'     => 'wallet',
-		'route'    => 'wallet',
-		'callback' => 'aspen_wallet_fluentcrm_render_wallet_tab_output',
-	);
+	$wallet_section = $sample_section;
+	$wallet_section['key']      = 'wallet';
+	$wallet_section['slug']     = 'wallet';
+	$wallet_section['route']    = 'wallet';
+	$wallet_section['hash']     = 'wallet';
+	$wallet_section['name']     = __( 'Wallet', 'aspen-wallet' );
+	$wallet_section['label']    = __( 'Wallet', 'aspen-wallet' );
+	$wallet_section['title']    = __( 'Wallet', 'aspen-wallet' );
+	$wallet_section['priority'] = 80;
+	$wallet_section['callback'] = 'aspen_wallet_fluentcrm_render_wallet_tab_output';
+
+	if ( isset( $wallet_section['path'] ) && is_string( $wallet_section['path'] ) ) {
+		$wallet_section['path'] = 'wallet';
+	}
+
+	if ( isset( $wallet_section['url'] ) && is_string( $wallet_section['url'] ) ) {
+		$wallet_section['url'] = 'wallet';
+	}
 
 	if ( isset( $sections['wallet'] ) && is_array( $sections['wallet'] ) ) {
 		$sections['wallet'] = array_merge( $wallet_section, $sections['wallet'] );
