@@ -10,6 +10,7 @@ function aspen_wallet_register_fluentcrm_hooks() {
 
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'admin_enqueue_scripts', 'aspen_wallet_fluentcrm_enqueue_admin_nav_patch' );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -67,6 +68,60 @@ function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
 	}
 
 	return $resolved_user_id;
+}
+
+function aspen_wallet_fluentcrm_enqueue_admin_nav_patch( $hook_suffix ) {
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( 'fluentcrm-admin' !== $page ) {
+		return;
+	}
+
+	if ( 'admin_page_fluentcrm-admin' !== $hook_suffix ) {
+		return;
+	}
+
+	wp_register_script( 'aspen-wallet-fcrm-nav-patch', '', array(), '1.0.0', true );
+	wp_enqueue_script( 'aspen-wallet-fcrm-nav-patch' );
+	wp_add_inline_script( 'aspen-wallet-fcrm-nav-patch', aspen_wallet_fluentcrm_nav_patch_js() );
+}
+
+function aspen_wallet_fluentcrm_nav_patch_js() {
+	return "(function () {\n"
+		. "\tvar PATCH_SELECTOR = 'a[href=\"#fluentcrm_sub_info_body\"],a[href=\"#/#fluentcrm_sub_info_body\"]';\n"
+		. "\tfunction getBaseHash() {\n"
+		. "\t\tvar hash = window.location.hash || '#/';\n"
+		. "\t\tif (hash.indexOf('#/') !== 0) {\n"
+		. "\t\t\treturn '#/';\n"
+		. "\t\t}\n"
+		. "\t\tvar nestedIndex = hash.indexOf('/#');\n"
+		. "\t\tif (nestedIndex !== -1) {\n"
+		. "\t\t\thash = hash.substring(0, nestedIndex + 1);\n"
+		. "\t\t}\n"
+		. "\t\tif (hash.charAt(hash.length - 1) !== '/') {\n"
+		. "\t\t\thash += '/';\n"
+		. "\t\t}\n"
+		. "\t\treturn hash;\n"
+		. "\t}\n"
+		. "\tfunction patchWalletLink() {\n"
+		. "\t\tvar walletLink = document.querySelector(PATCH_SELECTOR);\n"
+		. "\t\tif (!walletLink) {\n"
+		. "\t\t\treturn;\n"
+		. "\t\t}\n"
+		. "\t\twalletLink.setAttribute('href', getBaseHash() + '#fluentcrm_sub_info_body');\n"
+		. "\t}\n"
+		. "\tif (document.readyState === 'loading') {\n"
+		. "\t\tdocument.addEventListener('DOMContentLoaded', patchWalletLink);\n"
+		. "\t} else {\n"
+		. "\t\tpatchWalletLink();\n"
+		. "\t}\n"
+		. "\twindow.addEventListener('hashchange', patchWalletLink);\n"
+		. "\tvar observer = new MutationObserver(patchWalletLink);\n"
+		. "\tobserver.observe(document.body, { childList: true, subtree: true });\n"
+		. "})();";
 }
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
