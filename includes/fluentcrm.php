@@ -10,6 +10,8 @@ function aspen_wallet_register_fluentcrm_hooks() {
 
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_add_profile_tab', 20, 1 );
+	add_action( 'admin_enqueue_scripts', 'aspen_wallet_fluentcrm_enqueue_route_fix' );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -37,6 +39,20 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 		__( 'Wallet', 'aspen-wallet' ),
 		'aspen_wallet_fluentcrm_profile_section_callback'
 	);
+}
+
+function aspen_wallet_fluentcrm_add_profile_tab( $sections ) {
+	if ( ! is_array( $sections ) ) {
+		$sections = array();
+	}
+
+	$sections['aspen_wallet'] = array(
+		'slug'  => 'aspen_wallet',
+		'title' => __( 'Wallet', 'aspen-wallet' ),
+		'icon'  => 'el-icon-wallet',
+	);
+
+	return $sections;
 }
 
 
