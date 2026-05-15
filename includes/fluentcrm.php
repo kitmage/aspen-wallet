@@ -121,7 +121,7 @@ function aspen_wallet_fluentcrm_register_wallet_profile_section( $sections ) {
 		'priority' => 80,
 		'hash'     => 'wallet',
 		'route'    => 'wallet',
-		'callback' => 'aspen_wallet_fluentcrm_render_wallet_tab',
+		'callback' => 'aspen_wallet_fluentcrm_render_wallet_tab_output',
 	);
 
 	if ( isset( $sections['wallet'] ) && is_array( $sections['wallet'] ) ) {
@@ -138,6 +138,22 @@ function aspen_wallet_fluentcrm_register_wallet_profile_section( $sections ) {
 function aspen_wallet_fluentcrm_get_contact( $contact ) {
 	if ( is_object( $contact ) ) {
 		return $contact;
+	}
+
+	if ( is_array( $contact ) ) {
+		$contact_id = 0;
+
+		if ( isset( $contact['id'] ) ) {
+			$contact_id = aspen_wallet_to_int( $contact['id'] );
+		} elseif ( isset( $contact['subscriber_id'] ) ) {
+			$contact_id = aspen_wallet_to_int( $contact['subscriber_id'] );
+		} elseif ( isset( $contact['contact_id'] ) ) {
+			$contact_id = aspen_wallet_to_int( $contact['contact_id'] );
+		}
+
+		if ( $contact_id > 0 && class_exists( '\\FluentCrm\\App\\Models\\Subscriber' ) ) {
+			return \FluentCrm\App\Models\Subscriber::find( $contact_id );
+		}
 	}
 
 	$contact_id = isset( $_GET['contact_id'] ) ? aspen_wallet_to_int( $_GET['contact_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -167,6 +183,12 @@ function aspen_wallet_fluentcrm_get_contact( $contact ) {
 	}
 
 	return null;
+}
+
+function aspen_wallet_fluentcrm_render_wallet_tab_output( $contact = null ) {
+	ob_start();
+	aspen_wallet_fluentcrm_render_wallet_tab( $contact );
+	return (string) ob_get_clean();
 }
 
 function aspen_wallet_fluentcrm_get_wp_user_id_from_contact( $contact ) {
