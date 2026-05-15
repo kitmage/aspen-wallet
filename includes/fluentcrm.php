@@ -21,6 +21,8 @@ function aspen_wallet_fluentcrm_register_fallback_hooks() {
 	add_filter( 'fluentcrm_profile_nav', 'aspen_wallet_fluentcrm_fallback_register_wallet_nav' );
 	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_fallback_register_wallet_section' );
 	add_action( 'fluentcrm_profile_section_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
+	add_action( 'fluentcrm_profile_section_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
+	add_action( 'fluentcrm_profile_sections_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -129,9 +131,6 @@ function aspen_wallet_fluentcrm_fallback_render_wallet_section( $subscriber = nu
 	$user_id = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
 	echo aspen_wallet_fluentcrm_render_wallet_html( $user_id, aspen_wallet_get_buckets() );
 }
-
-add_action( 'fluentcrm_profile_section_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
-add_action( 'fluentcrm_profile_sections_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
 
 function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
 	$content_arr = is_array( $content ) ? $content : array();
