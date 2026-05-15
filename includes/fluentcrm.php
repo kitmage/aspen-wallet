@@ -10,6 +10,7 @@ function aspen_wallet_register_fluentcrm_hooks() {
 
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'admin_footer', 'aspen_wallet_fluentcrm_fix_profile_nav_link' );
 }
 
 function aspen_wallet_fluentcrm_has_extender_profile_api() {
@@ -67,6 +68,59 @@ function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
 	}
 
 	return $resolved_user_id;
+}
+
+function aspen_wallet_fluentcrm_fix_profile_nav_link() {
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( 'fluentcrm-admin' !== $page ) {
+		return;
+	}
+	?>
+	<script>
+		(function() {
+			function normalizeBaseHash(hashValue) {
+				if (!hashValue) {
+					return '#/';
+				}
+				var cleaned = hashValue.replace(/^#/, '');
+				if (!cleaned || cleaned === '/') {
+					return '#/';
+				}
+				var anchorIndex = cleaned.indexOf('#');
+				if (anchorIndex !== -1) {
+					cleaned = cleaned.substring(0, anchorIndex);
+				}
+				if (cleaned.charAt(0) !== '/') {
+					cleaned = '/' + cleaned;
+				}
+				if (cleaned.charAt(cleaned.length - 1) !== '/') {
+					cleaned += '/';
+				}
+				return '#' + cleaned;
+			}
+
+			function patchWalletLink() {
+				var walletLink = document.querySelector('a[href="#fluentcrm_sub_info_body"], a[href="#/#fluentcrm_sub_info_body"]');
+				if (!walletLink) {
+					return;
+				}
+
+				var hash = window.location.hash || '#/';
+				var baseHash = normalizeBaseHash(hash);
+				walletLink.setAttribute('href', baseHash + '#fluentcrm_sub_info_body');
+			}
+
+			patchWalletLink();
+			window.addEventListener('hashchange', patchWalletLink);
+			setTimeout(patchWalletLink, 300);
+			setTimeout(patchWalletLink, 1000);
+		})();
+	</script>
+	<?php
 }
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
