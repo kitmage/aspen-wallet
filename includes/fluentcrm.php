@@ -8,135 +8,164 @@ function aspen_wallet_register_fluentcrm_hooks() {
 		return;
 	}
 
-	add_filter( 'fluentcrm_contact_profile_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
-	add_filter( 'fluentcrm_contact_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
+	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
 
-	add_action( 'fluentcrm_contact_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
-	add_action( 'fluentcrm_contact_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	// Fallback for versions where Extender profile API is unavailable.
+	add_filter( 'fluentcrm_profile_nav', 'aspen_wallet_fluentcrm_fallback_register_wallet_nav' );
+	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_fallback_register_wallet_section' );
+	add_action( 'fluentcrm_profile_section_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
 }
 
-function aspen_wallet_fluentcrm_register_wallet_tab( $tabs ) {
-	if ( ! is_array( $tabs ) ) {
-		$tabs = array();
+function aspen_wallet_fluentcrm_register_profile_section() {
+	if ( ! function_exists( 'FluentCrmApi' ) ) {
+		return;
 	}
 
-	$tabs['wallet'] = array(
-		'title'    => __( 'Wallet', 'aspen-wallet' ),
-		'priority' => 80,
+	$extender = FluentCrmApi( 'extender' );
+	if ( ! $extender || ! method_exists( $extender, 'addProfileSection' ) ) {
+		return;
+	}
+
+	$extender->addProfileSection(
+		'aspen_wallet',
+		__( 'Wallet', 'aspen-wallet' ),
+		'aspen_wallet_fluentcrm_profile_section_callback'
 	);
-
-	return $tabs;
 }
 
-function aspen_wallet_fluentcrm_get_contact( $contact ) {
-	if ( is_object( $contact ) ) {
-		return $contact;
+function aspen_wallet_fluentcrm_fallback_register_wallet_nav( $nav ) {
+	$sample_item = array();
+	if ( is_array( $nav ) && isset( $nav[0] ) && is_array( $nav[0] ) ) {
+		$sample_item = $nav[0];
+	} elseif ( is_array( $nav ) ) {
+		$first = reset( $nav );
+		if ( is_array( $first ) ) {
+			$sample_item = $first;
+		}
 	}
 
-	$contact_id = isset( $_GET['contact_id'] ) ? aspen_wallet_to_int( $_GET['contact_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( $contact_id <= 0 ) {
-		return null;
+	if ( ! is_array( $nav ) ) {
+		$nav = array();
 	}
 
-	if ( class_exists( '\\FluentCrm\\App\\Models\\Subscriber' ) ) {
-		return \FluentCrm\App\Models\Subscriber::find( $contact_id );
-	}
+	$wallet_item = $sample_item;
+	$wallet_item = array_merge( $wallet_item, array(
+		'key'      => 'wallet',
+		'slug'     => 'wallet',
+		'title'    => __( 'Wallet', 'aspen-wallet' ),
+		'label'    => __( 'Wallet', 'aspen-wallet' ),
+		'name'     => __( 'Wallet', 'aspen-wallet' ),
+		'hash'     => 'wallet',
+		'route'    => 'wallet',
+		'path'     => 'wallet',
+		'url'      => 'wallet',
+		'priority' => 80,
+	) );
 
-	return null;
+	$nav[] = $wallet_item;
+
+	return $nav;
 }
 
-function aspen_wallet_fluentcrm_get_wp_user_id_from_contact( $contact ) {
-	if ( ! is_object( $contact ) ) {
+function aspen_wallet_fluentcrm_fallback_register_wallet_section( $sections ) {
+	$sample_section = array();
+	if ( is_array( $sections ) && isset( $sections[0] ) && is_array( $sections[0] ) ) {
+		$sample_section = $sections[0];
+	} elseif ( is_array( $sections ) ) {
+		$first = reset( $sections );
+		if ( is_array( $first ) ) {
+			$sample_section = $first;
+		}
+	}
+
+	if ( ! is_array( $sections ) ) {
+		$sections = array();
+	}
+
+	$wallet_section = $sample_section;
+	$wallet_section = array_merge( $wallet_section, array(
+		'key'   => 'wallet',
+		'slug'  => 'wallet',
+		'title' => __( 'Wallet', 'aspen-wallet' ),
+		'label' => __( 'Wallet', 'aspen-wallet' ),
+		'name'  => __( 'Wallet', 'aspen-wallet' ),
+		'hash'  => 'wallet',
+		'route' => 'wallet',
+		'path'  => 'wallet',
+		'url'   => 'wallet',
+	) );
+
+	$sections[] = $wallet_section;
+
+	return $sections;
+}
+
+function aspen_wallet_fluentcrm_fallback_render_wallet_section( $subscriber = null ) {
+	$user_id = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
+	echo aspen_wallet_fluentcrm_render_wallet_html( $user_id, aspen_wallet_get_buckets() );
+}
+
+add_action( 'fluentcrm_profile_section_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
+add_action( 'fluentcrm_profile_sections_content_wallet', 'aspen_wallet_fluentcrm_fallback_render_wallet_section' );
+
+function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
+	$content_arr = is_array( $content ) ? $content : array();
+	$user_id     = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
+	$buckets     = aspen_wallet_get_buckets();
+
+	$content_arr['heading'] = __( 'Wallet Balances', 'aspen-wallet' );
+	$content_arr['content_html'] = aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets );
+
+	return $content_arr;
+}
+
+function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
+	if ( ! is_object( $subscriber ) ) {
 		return 0;
 	}
 
-	if ( isset( $contact->user_id ) ) {
-		return (int) $contact->user_id;
+	if ( isset( $subscriber->user_id ) ) {
+		return (int) $subscriber->user_id;
 	}
 
-	if ( isset( $contact->wp_user_id ) ) {
-		return (int) $contact->wp_user_id;
+	if ( isset( $subscriber->wp_user_id ) ) {
+		return (int) $subscriber->wp_user_id;
 	}
 
-	if ( method_exists( $contact, 'getUserId' ) ) {
-		return (int) $contact->getUserId();
+	if ( method_exists( $subscriber, 'getUserId' ) ) {
+		return (int) $subscriber->getUserId();
 	}
 
 	return 0;
 }
 
-function aspen_wallet_fluentcrm_can_manage_wallet() {
-	return current_user_can( 'manage_options' ) || current_user_can( 'fluentcrm_manage_contacts' );
-}
-
-function aspen_wallet_fluentcrm_render_wallet_tab( $contact = null ) {
-	$contact    = aspen_wallet_fluentcrm_get_contact( $contact );
-	$buckets    = aspen_wallet_get_buckets();
-	$notice     = '';
-	$notice_css = '';
-
-	if ( ! aspen_wallet_fluentcrm_can_manage_wallet() ) {
-		echo '<p>' . esc_html__( 'You do not have permission to manage wallet balances.', 'aspen-wallet' ) . '</p>';
-		return;
+function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
+	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fluentcrm_manage_contacts' ) ) {
+		return '<p>' . esc_html__( 'You do not have permission to manage wallet balances.', 'aspen-wallet' ) . '</p>';
 	}
 
-	if ( ! $contact ) {
-		echo '<p>' . esc_html__( 'Unable to load FluentCRM contact.', 'aspen-wallet' ) . '</p>';
-		return;
+	if ( $user_id <= 0 ) {
+		return '<p>' . esc_html__( 'This contact is not mapped to a WordPress user, so wallet balances cannot be edited.', 'aspen-wallet' ) . '</p>';
 	}
 
-	$user_id = aspen_wallet_fluentcrm_get_wp_user_id_from_contact( $contact );
+	if ( empty( $buckets ) ) {
+		return '<p>' . esc_html__( 'No wallet buckets configured yet.', 'aspen-wallet' ) . '</p>';
+	}
 
 	if ( isset( $_POST['aspen_wallet_fcrm_action'] ) && 'save_wallet' === sanitize_text_field( wp_unslash( $_POST['aspen_wallet_fcrm_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$nonce_ok = isset( $_POST['aspen_wallet_fcrm_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['aspen_wallet_fcrm_nonce'] ) ), 'aspen_wallet_fcrm_save' );
-
-		if ( ! $nonce_ok ) {
-			$notice     = __( 'Security check failed. Please refresh and try again.', 'aspen-wallet' );
-			$notice_css = 'notice notice-error';
-		} elseif ( $user_id <= 0 ) {
-			$notice     = __( 'This contact is not linked to a WordPress user.', 'aspen-wallet' );
-			$notice_css = 'notice notice-error';
-		} else {
+		if ( $nonce_ok ) {
 			$values = isset( $_POST['aspen_wallet_balances'] ) && is_array( $_POST['aspen_wallet_balances'] ) ? wp_unslash( $_POST['aspen_wallet_balances'] ) : array();
-
-			$save_error = false;
 			foreach ( $buckets as $bucket ) {
 				$slug   = $bucket['slug'];
 				$amount = isset( $values[ $slug ] ) ? aspen_wallet_to_int( $values[ $slug ] ) : 0;
-
-				if ( ! wallet_set_balance( $user_id, $slug, $amount ) ) {
-					$save_error = true;
-				}
-			}
-
-			if ( $save_error ) {
-				$notice     = __( 'Some balances could not be saved. Please try again.', 'aspen-wallet' );
-				$notice_css = 'notice notice-error';
-			} else {
-				$notice     = __( 'Wallet balances saved.', 'aspen-wallet' );
-				$notice_css = 'notice notice-success';
+				wallet_set_balance( $user_id, $slug, $amount );
 			}
 		}
 	}
 
-	echo '<div class="aspen-wallet-fcrm-tab">';
-
-	if ( '' !== $notice ) {
-		echo '<div class="' . esc_attr( $notice_css ) . '"><p>' . esc_html( $notice ) . '</p></div>';
-	}
-
-	if ( $user_id <= 0 ) {
-		echo '<p>' . esc_html__( 'This contact is not mapped to a WordPress user, so wallet balances cannot be edited.', 'aspen-wallet' ) . '</p>';
-		echo '</div>';
-		return;
-	}
-
-	if ( empty( $buckets ) ) {
-		echo '<p>' . esc_html__( 'No wallet buckets configured yet.', 'aspen-wallet' ) . '</p>';
-		echo '</div>';
-		return;
-	}
-
+	ob_start();
 	echo '<form method="post">';
 	echo '<input type="hidden" name="aspen_wallet_fcrm_action" value="save_wallet" />';
 	wp_nonce_field( 'aspen_wallet_fcrm_save', 'aspen_wallet_fcrm_nonce' );
@@ -146,7 +175,6 @@ function aspen_wallet_fluentcrm_render_wallet_tab( $contact = null ) {
 		$slug    = $bucket['slug'];
 		$label   = isset( $bucket['label'] ) ? $bucket['label'] : $slug;
 		$balance = wallet_get_balance( $user_id, $slug );
-
 		echo '<tr>';
 		echo '<td><strong>' . esc_html( $label ) . '</strong><br /><code>' . esc_html( $slug ) . '</code></td>';
 		echo '<td><input type="number" min="0" step="1" name="aspen_wallet_balances[' . esc_attr( $slug ) . ']" value="' . esc_attr( $balance ) . '" class="small-text" /></td>';
@@ -156,5 +184,6 @@ function aspen_wallet_fluentcrm_render_wallet_tab( $contact = null ) {
 	echo '</tbody></table>';
 	echo '<p><button type="submit" class="button button-primary">' . esc_html__( 'Save Wallet Balances', 'aspen-wallet' ) . '</button></p>';
 	echo '</form>';
-	echo '</div>';
+
+	return (string) ob_get_clean();
 }
