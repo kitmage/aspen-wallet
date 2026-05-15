@@ -4,22 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function aspen_wallet_register_fluentcrm_hooks() {
-	if ( ! defined( 'FLUENTCRM' ) ) {
-		return;
-	}
-
 	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_remove_broken_wallet_tabs', 999, 1 );
-}
-
-function aspen_wallet_fluentcrm_has_extender_profile_api() {
-	if ( ! function_exists( 'FluentCrmApi' ) ) {
-		return false;
-	}
-
-	$extender = FluentCrmApi( 'extender' );
-	return $extender && method_exists( $extender, 'addProfileSection' );
 }
 
 function aspen_wallet_fluentcrm_register_profile_section() {
@@ -27,98 +12,49 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 		return;
 	}
 
-	if ( ! aspen_wallet_fluentcrm_has_extender_profile_api() ) {
+	$extender = FluentCrmApi( 'extender' );
+	if ( ! $extender || ! method_exists( $extender, 'addProfileSection' ) ) {
 		return;
 	}
 
-	$extender = FluentCrmApi( 'extender' );
-
-	$section_slugs = array(
-		'fluentcrm_sub_info_body',
-		'wallet',
+	$extender->addProfileSection(
 		'aspen_wallet',
+		__( 'Wallet', 'aspen-wallet' ),
+		'aspen_wallet_fluentcrm_profile_section_callback',
+		3
 	);
-
-	foreach ( $section_slugs as $section_slug ) {
-		$extender->addProfileSection(
-			$section_slug,
-			__( 'Wallet', 'aspen-wallet' ),
-			'aspen_wallet_fluentcrm_profile_section_callback'
-		);
-	}
 }
-
-function aspen_wallet_fluentcrm_add_profile_tab( $sections ) {
-	if ( ! is_array( $sections ) ) {
-		$sections = array();
-	}
-
-	$sections['aspen_wallet'] = array(
-		'slug'  => 'aspen_wallet',
-		'title' => __( 'Wallet', 'aspen-wallet' ),
-		'icon'  => 'el-icon-wallet',
-	);
-
-	return $sections;
-}
-
 
 function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
 	$content_arr = is_array( $content ) ? $content : array();
 	$user_id     = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
 	$buckets     = aspen_wallet_get_buckets();
 
-	$content_arr['heading'] = __( 'Wallet Balances', 'aspen-wallet' );
+	$content_arr['heading']      = __( 'Wallet Balances', 'aspen-wallet' );
 	$content_arr['content_html'] = aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets );
 
 	return $content_arr;
 }
 
 function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
-	$resolved_user_id = 0;
-
 	if ( ! is_object( $subscriber ) ) {
-		return $resolved_user_id;
+		return 0;
 	}
 
 	if ( isset( $subscriber->user_id ) ) {
-		$resolved_user_id = (int) $subscriber->user_id;
-	} elseif ( isset( $subscriber->wp_user_id ) ) {
-		$resolved_user_id = (int) $subscriber->wp_user_id;
-	} elseif ( method_exists( $subscriber, 'getUserId' ) ) {
-		$resolved_user_id = (int) $subscriber->getUserId();
+		return (int) $subscriber->user_id;
 	}
 
-	return $resolved_user_id;
-}
-
-/**
- * Back-compat no-op for older deployments that may still register this callback.
- *
- * @param string $hook_suffix Current admin hook suffix.
- * @return void
- */
-function aspen_wallet_fluentcrm_enqueue_route_fix( $hook_suffix ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	// Intentionally left blank.
-}
-
-/**
- * Remove legacy/broken Wallet custom tabs from FluentCRM nav.
- *
- * @param array $sections Profile section definitions.
- * @return array
- */
-function aspen_wallet_fluentcrm_remove_broken_wallet_tabs( $sections ) {
-	if ( ! is_array( $sections ) ) {
-		return $sections;
+	if ( isset( $subscriber->wp_user_id ) ) {
+		return (int) $subscriber->wp_user_id;
 	}
 
-	unset( $sections['wallet'] );
-	unset( $sections['aspen_wallet'] );
+	if ( method_exists( $subscriber, 'getUserId' ) ) {
+		return (int) $subscriber->getUserId();
+	}
 
-	return $sections;
+	return 0;
 }
-
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
 	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fluentcrm_manage_contacts' ) ) {
