@@ -20,6 +20,9 @@ function aspen_wallet_register_fluentcrm_hooks() {
 	add_action( 'fluentcrm_subscriber_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 	add_action( 'fluentcrm_subscriber_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 	add_action( 'fluentcrm_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_profile_section_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_profile_section_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
+	add_action( 'fluentcrm_profile_sections_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 
 	aspen_wallet_fluentcrm_debug_log( 'Registered FluentCRM wallet hooks.' );
 }
@@ -113,8 +116,12 @@ function aspen_wallet_fluentcrm_register_wallet_profile_section( $sections ) {
 		'key'      => 'wallet',
 		'label'    => __( 'Wallet', 'aspen-wallet' ),
 		'title'    => __( 'Wallet', 'aspen-wallet' ),
+		'slug'     => 'wallet',
+		'name'     => __( 'Wallet', 'aspen-wallet' ),
 		'priority' => 80,
 		'hash'     => 'wallet',
+		'route'    => 'wallet',
+		'callback' => 'aspen_wallet_fluentcrm_render_wallet_tab',
 	);
 
 	if ( isset( $sections['wallet'] ) && is_array( $sections['wallet'] ) ) {
