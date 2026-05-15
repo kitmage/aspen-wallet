@@ -4,121 +4,108 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function aspen_wallet_register_fluentcrm_hooks() {
-	if ( ! defined( 'FLUENTCRM' ) ) {
+	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'admin_notices', 'aspen_wallet_fluentcrm_debug_admin_notice' );
+}
+
+function aspen_wallet_fluentcrm_debug_enabled() {
+	$enabled = defined( 'WP_DEBUG' ) && WP_DEBUG;
+
+	/**
+	 * Filter whether FluentCRM Wallet debug output is enabled.
+	 *
+	 * @param bool $enabled Whether debug output is enabled.
+	 */
+	return (bool) apply_filters( 'aspen_wallet_fluentcrm_debug_enabled', $enabled );
+}
+
+function aspen_wallet_fluentcrm_debug_log( $message, $context = array() ) {
+	if ( ! aspen_wallet_fluentcrm_debug_enabled() ) {
 		return;
 	}
 
-	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_remove_broken_wallet_tabs', 999, 1 );
-}
-
-function aspen_wallet_fluentcrm_has_extender_profile_api() {
-	if ( ! function_exists( 'FluentCrmApi' ) ) {
-		return false;
-	}
-
-	$extender = FluentCrmApi( 'extender' );
-	return $extender && method_exists( $extender, 'addProfileSection' );
+	$payload = is_array( $context ) && ! empty( $context ) ? wp_json_encode( $context ) : '';
+	error_log( '[Aspen Wallet][FluentCRM] ' . $message . ( $payload ? ' ' . $payload : '' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 }
 
 function aspen_wallet_fluentcrm_register_profile_section() {
 	if ( ! function_exists( 'FluentCrmApi' ) ) {
-		return;
-	}
-
-	if ( ! aspen_wallet_fluentcrm_has_extender_profile_api() ) {
+		aspen_wallet_fluentcrm_debug_log( 'Skipped section registration: FluentCrmApi() not available.' );
 		return;
 	}
 
 	$extender = FluentCrmApi( 'extender' );
+	if ( ! $extender || ! method_exists( $extender, 'addProfileSection' ) ) {
+		aspen_wallet_fluentcrm_debug_log( 'Skipped section registration: extender API unavailable.' );
+		return;
+	}
 
-	$section_slugs = array(
-		'fluentcrm_sub_info_body',
-		'wallet',
+	$extender->addProfileSection(
 		'aspen_wallet',
+		__( 'Wallet', 'aspen-wallet' ),
+		'aspen_wallet_fluentcrm_profile_section_callback',
+		3
 	);
 
-	foreach ( $section_slugs as $section_slug ) {
-		$extender->addProfileSection(
-			$section_slug,
-			__( 'Wallet', 'aspen-wallet' ),
-			'aspen_wallet_fluentcrm_profile_section_callback'
-		);
-	}
+	aspen_wallet_fluentcrm_debug_log( 'Registered Wallet profile section.', array( 'priority' => 3 ) );
 }
 
-function aspen_wallet_fluentcrm_add_profile_tab( $sections ) {
-	if ( ! is_array( $sections ) ) {
-		$sections = array();
+function aspen_wallet_fluentcrm_debug_admin_notice() {
+	if ( ! aspen_wallet_fluentcrm_debug_enabled() || ! current_user_can( 'manage_options' ) ) {
+		return;
 	}
 
-	$sections['aspen_wallet'] = array(
-		'slug'  => 'aspen_wallet',
-		'title' => __( 'Wallet', 'aspen-wallet' ),
-		'icon'  => 'el-icon-wallet',
-	);
+	if ( ! isset( $_GET['page'] ) || 'fluentcrm-admin' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return;
+	}
 
-	return $sections;
+	$did_init = did_action( 'fluent_crm/after_init' );
+	$has_api  = function_exists( 'FluentCrmApi' );
+
+	echo '<div class="notice notice-info"><p>';
+	echo esc_html__( 'Aspen Wallet debug:', 'aspen-wallet' ) . ' ';
+	echo esc_html( sprintf( 'fluent_crm/after_init fired=%1$d, FluentCrmApi available=%2$s', (int) $did_init, $has_api ? 'yes' : 'no' ) );
+	echo '</p></div>';
 }
-
 
 function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
 	$content_arr = is_array( $content ) ? $content : array();
 	$user_id     = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
 	$buckets     = aspen_wallet_get_buckets();
 
-	$content_arr['heading'] = __( 'Wallet Balances', 'aspen-wallet' );
+	aspen_wallet_fluentcrm_debug_log(
+		'Profile section callback invoked.',
+		array(
+			'user_id'      => $user_id,
+			'bucket_count' => is_array( $buckets ) ? count( $buckets ) : 0,
+		)
+	);
+
+	$content_arr['heading']      = __( 'Wallet Balances', 'aspen-wallet' );
 	$content_arr['content_html'] = aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets );
 
 	return $content_arr;
 }
 
 function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
-	$resolved_user_id = 0;
-
 	if ( ! is_object( $subscriber ) ) {
-		return $resolved_user_id;
+		return 0;
 	}
 
 	if ( isset( $subscriber->user_id ) ) {
-		$resolved_user_id = (int) $subscriber->user_id;
-	} elseif ( isset( $subscriber->wp_user_id ) ) {
-		$resolved_user_id = (int) $subscriber->wp_user_id;
-	} elseif ( method_exists( $subscriber, 'getUserId' ) ) {
-		$resolved_user_id = (int) $subscriber->getUserId();
+		return (int) $subscriber->user_id;
 	}
 
-	return $resolved_user_id;
-}
-
-/**
- * Back-compat no-op for older deployments that may still register this callback.
- *
- * @param string $hook_suffix Current admin hook suffix.
- * @return void
- */
-function aspen_wallet_fluentcrm_enqueue_route_fix( $hook_suffix ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	// Intentionally left blank.
-}
-
-/**
- * Remove legacy/broken Wallet custom tabs from FluentCRM nav.
- *
- * @param array $sections Profile section definitions.
- * @return array
- */
-function aspen_wallet_fluentcrm_remove_broken_wallet_tabs( $sections ) {
-	if ( ! is_array( $sections ) ) {
-		return $sections;
+	if ( isset( $subscriber->wp_user_id ) ) {
+		return (int) $subscriber->wp_user_id;
 	}
 
-	unset( $sections['wallet'] );
-	unset( $sections['aspen_wallet'] );
+	if ( method_exists( $subscriber, 'getUserId' ) ) {
+		return (int) $subscriber->getUserId();
+	}
 
-	return $sections;
+	return 0;
 }
-
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
 	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fluentcrm_manage_contacts' ) ) {
