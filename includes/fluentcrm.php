@@ -33,7 +33,7 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 	$extender = FluentCrmApi( 'extender' );
 
 	$extender->addProfileSection(
-		'wallet',
+		'fluentcrm_sub_info_body',
 		__( 'Wallet', 'aspen-wallet' ),
 		'aspen_wallet_fluentcrm_profile_section_callback'
 	);
@@ -68,6 +68,17 @@ function aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber ) {
 
 	return $resolved_user_id;
 }
+
+/**
+ * Back-compat no-op for older deployments that may still register this callback.
+ *
+ * @param string $hook_suffix Current admin hook suffix.
+ * @return void
+ */
+function aspen_wallet_fluentcrm_enqueue_route_fix( $hook_suffix ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	// Intentionally left blank.
+}
+
 
 function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
 	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fluentcrm_manage_contacts' ) ) {
