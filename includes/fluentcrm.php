@@ -48,6 +48,20 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 	}
 }
 
+function aspen_wallet_fluentcrm_add_profile_tab( $sections ) {
+	if ( ! is_array( $sections ) ) {
+		$sections = array();
+	}
+
+	$sections['aspen_wallet'] = array(
+		'slug'  => 'aspen_wallet',
+		'title' => __( 'Wallet', 'aspen-wallet' ),
+		'icon'  => 'el-icon-wallet',
+	);
+
+	return $sections;
+}
+
 
 function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
 	$content_arr = is_array( $content ) ? $content : array();
