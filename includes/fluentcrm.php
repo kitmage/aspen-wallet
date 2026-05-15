@@ -186,8 +186,31 @@ function aspen_wallet_fluentcrm_get_contact( $contact ) {
 }
 
 function aspen_wallet_fluentcrm_render_wallet_tab_output( $contact = null ) {
+	aspen_wallet_fluentcrm_debug_log(
+		'Wallet output callback invoked.',
+		array(
+			'contact_type' => gettype( $contact ),
+			'hook'         => current_filter(),
+		)
+	);
+
 	ob_start();
-	aspen_wallet_fluentcrm_render_wallet_tab( $contact );
+
+	try {
+		aspen_wallet_fluentcrm_render_wallet_tab( $contact );
+	} catch ( \Throwable $error ) {
+		aspen_wallet_fluentcrm_debug_log(
+			'Wallet render callback exception.',
+			array(
+				'message' => $error->getMessage(),
+				'file'    => $error->getFile(),
+				'line'    => $error->getLine(),
+			)
+		);
+
+		echo '<p>' . esc_html__( 'Wallet failed to render. Check debug log for details.', 'aspen-wallet' ) . '</p>';
+	}
+
 	return (string) ob_get_clean();
 }
 
