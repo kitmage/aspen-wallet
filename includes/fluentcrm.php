@@ -66,11 +66,22 @@ function aspen_wallet_fluentcrm_register_wallet_tab( $tabs ) {
 }
 
 function aspen_wallet_fluentcrm_register_wallet_profile_nav( $nav ) {
+	$sample_item = array();
+	if ( is_array( $nav ) && isset( $nav[0] ) && is_array( $nav[0] ) ) {
+		$sample_item = $nav[0];
+	} elseif ( is_array( $nav ) ) {
+		$first = reset( $nav );
+		if ( is_array( $first ) ) {
+			$sample_item = $first;
+		}
+	}
+
 	aspen_wallet_fluentcrm_debug_log(
 		'Profile nav filter fired.',
 		array(
-			'hook'     => current_filter(),
-			'nav_type' => gettype( $nav ),
+			'hook'             => current_filter(),
+			'nav_type'         => gettype( $nav ),
+			'sample_nav_keys'  => array_keys( $sample_item ),
 		)
 	);
 
@@ -78,12 +89,19 @@ function aspen_wallet_fluentcrm_register_wallet_profile_nav( $nav ) {
 		$nav = array();
 	}
 
-	$wallet_item = array(
-		'slug'     => 'wallet',
-		'title'    => __( 'Wallet', 'aspen-wallet' ),
-		'hash'     => 'wallet',
-		'priority' => 80,
-	);
+	$wallet_item = $sample_item;
+	$wallet_item['slug']     = 'wallet';
+	$wallet_item['key']      = 'wallet';
+	$wallet_item['hash']     = 'wallet';
+	$wallet_item['route']    = 'wallet';
+	$wallet_item['name']     = __( 'Wallet', 'aspen-wallet' );
+	$wallet_item['title']    = __( 'Wallet', 'aspen-wallet' );
+	$wallet_item['label']    = __( 'Wallet', 'aspen-wallet' );
+	$wallet_item['priority'] = 80;
+
+	if ( isset( $wallet_item['url'] ) && is_string( $wallet_item['url'] ) ) {
+		$wallet_item['url'] = 'wallet';
+	}
 
 	if ( isset( $nav['wallet'] ) && is_array( $nav['wallet'] ) ) {
 		$nav['wallet'] = array_merge( $wallet_item, $nav['wallet'] );
