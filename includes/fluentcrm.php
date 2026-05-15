@@ -33,11 +33,19 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 
 	$extender = FluentCrmApi( 'extender' );
 
-	$extender->addProfileSection(
+	$section_slugs = array(
 		'fluentcrm_sub_info_body',
-		__( 'Wallet', 'aspen-wallet' ),
-		'aspen_wallet_fluentcrm_profile_section_callback'
+		'wallet',
+		'aspen_wallet',
 	);
+
+	foreach ( $section_slugs as $section_slug ) {
+		$extender->addProfileSection(
+			$section_slug,
+			__( 'Wallet', 'aspen-wallet' ),
+			'aspen_wallet_fluentcrm_profile_section_callback'
+		);
+	}
 }
 
 function aspen_wallet_fluentcrm_add_profile_tab( $sections ) {
