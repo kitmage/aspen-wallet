@@ -13,6 +13,7 @@ function aspen_wallet_register_fluentcrm_hooks() {
 	add_filter( 'fluentcrm_contact_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
 	add_filter( 'fluentcrm_subscriber_profile_tabs', 'aspen_wallet_fluentcrm_register_wallet_tab' );
 	add_filter( 'fluentcrm_profile_nav', 'aspen_wallet_fluentcrm_register_wallet_profile_nav' );
+	add_filter( 'fluentcrm_profile_sections', 'aspen_wallet_fluentcrm_register_wallet_profile_section' );
 
 	add_action( 'fluentcrm_contact_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 	add_action( 'fluentcrm_contact_wallet_tab_content', 'aspen_wallet_fluentcrm_render_wallet_tab' );
@@ -21,47 +22,6 @@ function aspen_wallet_register_fluentcrm_hooks() {
 	add_action( 'fluentcrm_profile_tab_content_wallet', 'aspen_wallet_fluentcrm_render_wallet_tab' );
 
 	aspen_wallet_fluentcrm_debug_log( 'Registered FluentCRM wallet hooks.' );
-
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		add_action( 'all', 'aspen_wallet_fluentcrm_trace_runtime_hooks', 1 );
-	}
-}
-
-function aspen_wallet_fluentcrm_trace_runtime_hooks( $arg = null ) {
-	static $seen = array();
-	static $count = 0;
-
-	if ( ! is_admin() ) {
-		return;
-	}
-
-	$hook = current_filter();
-	if ( ! is_string( $hook ) || '' === $hook ) {
-		return;
-	}
-
-	if ( false === strpos( $hook, 'fluentcrm' ) ) {
-		return;
-	}
-
-	if ( isset( $seen[ $hook ] ) ) {
-		return;
-	}
-
-	if ( $count >= 120 ) {
-		return;
-	}
-
-	$seen[ $hook ] = true;
-	++$count;
-
-	aspen_wallet_fluentcrm_debug_log(
-		'Observed FluentCRM runtime hook.',
-		array(
-			'hook'  => $hook,
-			'count' => $count,
-		)
-	);
 }
 
 function aspen_wallet_fluentcrm_debug_log( $message, $context = array() ) {
@@ -134,6 +94,38 @@ function aspen_wallet_fluentcrm_register_wallet_profile_nav( $nav ) {
 
 	$nav['wallet'] = $wallet_item;
 	return $nav;
+}
+
+function aspen_wallet_fluentcrm_register_wallet_profile_section( $sections ) {
+	aspen_wallet_fluentcrm_debug_log(
+		'Profile sections filter fired.',
+		array(
+			'hook'          => current_filter(),
+			'sections_type' => gettype( $sections ),
+		)
+	);
+
+	if ( ! is_array( $sections ) ) {
+		$sections = array();
+	}
+
+	$wallet_section = array(
+		'key'      => 'wallet',
+		'label'    => __( 'Wallet', 'aspen-wallet' ),
+		'title'    => __( 'Wallet', 'aspen-wallet' ),
+		'priority' => 80,
+		'hash'     => 'wallet',
+	);
+
+	if ( isset( $sections['wallet'] ) && is_array( $sections['wallet'] ) ) {
+		$sections['wallet'] = array_merge( $wallet_section, $sections['wallet'] );
+	} elseif ( isset( $sections[0] ) && is_array( $sections[0] ) ) {
+		$sections[] = $wallet_section;
+	} else {
+		$sections['wallet'] = $wallet_section;
+	}
+
+	return $sections;
 }
 
 function aspen_wallet_fluentcrm_get_contact( $contact ) {
