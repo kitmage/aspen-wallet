@@ -6,6 +6,157 @@ if ( ! defined( 'ABSPATH' ) ) {
 function aspen_wallet_register_admin_wallet_users_hooks() {
 	add_action( 'admin_menu', 'aspen_wallet_register_users_admin_menu', 5 );
 	add_action( 'admin_post_aspen_wallet_save_user_balances', 'aspen_wallet_handle_save_user_balances' );
+	add_action( 'show_user_profile', 'aspen_wallet_render_profile_wallet_section' );
+	add_action( 'edit_user_profile', 'aspen_wallet_render_profile_wallet_section' );
+	add_action( 'personal_options_update', 'aspen_wallet_handle_profile_wallet_save' );
+	add_action( 'edit_user_profile_update', 'aspen_wallet_handle_profile_wallet_save' );
+	add_action( 'admin_notices', 'aspen_wallet_render_profile_wallet_notices' );
+}
+
+/**
+ * Render wallet balances section on user profile screens.
+ *
+ * @param WP_User $user User object being edited.
+ * @return void
+ */
+function aspen_wallet_render_profile_wallet_section( $user ) {
+	if ( ! ( $user instanceof WP_User ) || ! current_user_can( 'edit_user', $user->ID ) ) {
+		return;
+	}
+
+	$buckets = aspen_wallet_get_buckets();
+	?>
+	<h2><?php echo esc_html__( 'Wallet Balances', 'aspen-wallet' ); ?></h2>
+	<table class="form-table" role="presentation">
+		<tbody>
+			<?php if ( empty( $buckets ) ) : ?>
+				<tr>
+					<th><?php echo esc_html__( 'Wallet', 'aspen-wallet' ); ?></th>
+					<td><em><?php echo esc_html__( 'No buckets configured yet.', 'aspen-wallet' ); ?></em></td>
+				</tr>
+			<?php else : ?>
+				<?php foreach ( $buckets as $bucket ) : ?>
+					<?php
+					$slug    = $bucket['slug'];
+					$balance = wallet_get_balance( $user->ID, $slug );
+					?>
+					<tr>
+						<th><label for="wallet_bucket_<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $bucket['label'] ); ?></label></th>
+						<td>
+							<input id="wallet_bucket_<?php echo esc_attr( $slug ); ?>" type="number" name="wallet_bucket[<?php echo esc_attr( $slug ); ?>]" min="0" step="1" value="<?php echo esc_attr( $balance ); ?>" class="regular-text" />
+							<p class="description"><code><?php echo esc_html( $slug ); ?></code></p>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</tbody>
+	</table>
+	<?php wp_nonce_field( 'aspen_wallet_profile_wallet_save', 'aspen_wallet_profile_wallet_nonce' ); ?>
+	<?php
+}
+
+/**
+ * Save wallet balances from user profile screens.
+ *
+ * @param int $user_id User ID being updated.
+ * @return void
+ */
+function aspen_wallet_handle_profile_wallet_save( $user_id ) {
+	$user_id = (int) $user_id;
+
+	if ( $user_id <= 0 || ! current_user_can( 'edit_user', $user_id ) ) {
+		return;
+	}
+
+	$nonce = isset( $_POST['aspen_wallet_profile_wallet_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['aspen_wallet_profile_wallet_nonce'] ) ) : '';
+	if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'aspen_wallet_profile_wallet_save' ) ) {
+		aspen_wallet_add_profile_wallet_notice( 'error', __( 'Wallet balances were not saved: invalid wallet profile nonce.', 'aspen-wallet' ) );
+		return;
+	}
+
+	$raw_values = isset( $_POST['wallet_bucket'] ) && is_array( $_POST['wallet_bucket'] ) ? wp_unslash( $_POST['wallet_bucket'] ) : array();
+	$buckets    = aspen_wallet_get_buckets();
+	$errors     = array();
+	$updated    = 0;
+
+	foreach ( $buckets as $bucket ) {
+		$slug       = $bucket['slug'];
+		$label      = $bucket['label'];
+		$raw_amount = isset( $raw_values[ $slug ] ) ? sanitize_text_field( (string) $raw_values[ $slug ] ) : '0';
+
+		if ( ! preg_match( '/^-?\d+$/', $raw_amount ) ) {
+			$errors[] = sprintf( __( '%1$s must be a whole integer.', 'aspen-wallet' ), $label );
+			continue;
+		}
+
+		$amount = (int) $raw_amount;
+		if ( $amount < 0 ) {
+			$amount = 0;
+		}
+
+		if ( wallet_set_balance( $user_id, $slug, $amount ) ) {
+			$updated++;
+		}
+	}
+
+	foreach ( $errors as $error ) {
+		aspen_wallet_add_profile_wallet_notice( 'error', $error );
+	}
+
+	if ( empty( $errors ) ) {
+		aspen_wallet_add_profile_wallet_notice( 'success', __( 'Wallet balances updated.', 'aspen-wallet' ) );
+	} elseif ( $updated > 0 ) {
+		aspen_wallet_add_profile_wallet_notice( 'success', __( 'Wallet balances partially updated.', 'aspen-wallet' ) );
+	}
+}
+
+function aspen_wallet_add_profile_wallet_notice( $type, $message ) {
+	if ( ! is_user_logged_in() || '' === $message ) {
+		return;
+	}
+
+	$user_id = get_current_user_id();
+	$key     = 'aspen_wallet_profile_notices';
+	$notices = get_user_meta( $user_id, $key, true );
+
+	if ( ! is_array( $notices ) ) {
+		$notices = array();
+	}
+
+	$notices[] = array(
+		'type'    => ( 'success' === $type ) ? 'success' : 'error',
+		'message' => sanitize_text_field( $message ),
+	);
+
+	update_user_meta( $user_id, $key, $notices );
+}
+
+function aspen_wallet_render_profile_wallet_notices() {
+	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+	if ( ! $screen || ! in_array( $screen->id, array( 'profile', 'user-edit' ), true ) ) {
+		return;
+	}
+
+	$user_id = get_current_user_id();
+	$key     = 'aspen_wallet_profile_notices';
+	$notices = get_user_meta( $user_id, $key, true );
+
+	if ( ! is_array( $notices ) || empty( $notices ) ) {
+		return;
+	}
+
+	delete_user_meta( $user_id, $key );
+
+	foreach ( $notices as $notice ) {
+		$type    = ( isset( $notice['type'] ) && 'success' === $notice['type'] ) ? 'notice-success' : 'notice-error';
+		$message = isset( $notice['message'] ) ? sanitize_text_field( $notice['message'] ) : '';
+
+		if ( '' === $message ) {
+			continue;
+		}
+
+		echo '<div class="notice ' . esc_attr( $type ) . ' is-dismissible"><p>' . esc_html( $message ) . '</p></div>';
+	}
 }
 
 function aspen_wallet_register_users_admin_menu() {
