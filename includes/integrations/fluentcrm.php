@@ -3,55 +3,59 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Register FluentCRM hooks only when integration prerequisites are available.
+ *
+ * @return void
+ */
 function aspen_wallet_register_fluentcrm_hooks() {
-	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
-	add_action( 'admin_notices', 'aspen_wallet_fluentcrm_debug_admin_notice' );
-}
-
-function aspen_wallet_fluentcrm_debug_enabled() {
-	$enabled = defined( 'WP_DEBUG' ) && WP_DEBUG;
-
-	/**
-	 * Filter whether FluentCRM Wallet debug output is enabled.
-	 *
-	 * @param bool $enabled Whether debug output is enabled.
-	 */
-	return (bool) apply_filters( 'aspen_wallet_fluentcrm_debug_enabled', $enabled );
-}
-
-function aspen_wallet_fluentcrm_debug_log( $message, $context = array() ) {
-	if ( ! aspen_wallet_fluentcrm_debug_enabled() ) {
+	if ( ! aspen_wallet_fluentcrm_is_available() ) {
+		add_action( 'admin_notices', 'aspen_wallet_fluentcrm_missing_notice' );
 		return;
 	}
 
-	$payload = is_array( $context ) && ! empty( $context ) ? wp_json_encode( $context ) : '';
-	error_log( '[Aspen Wallet][FluentCRM] ' . $message . ( $payload ? ' ' . $payload : '' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	add_action( 'fluent_crm/after_init', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+	add_action( 'fluentcrm_loaded', 'aspen_wallet_fluentcrm_register_profile_section', 20 );
+}
+
+/**
+ * Check FluentCRM integration readiness.
+ *
+ * @return bool
+ */
+function aspen_wallet_fluentcrm_is_available() {
+	if ( ! function_exists( 'FluentCrmApi' ) ) {
+		return false;
+	}
+
+	$extender = FluentCrmApi( 'extender' );
+
+	return ( is_object( $extender ) && method_exists( $extender, 'addProfileSection' ) );
+}
+
+/**
+ * Render missing-integration admin notice.
+ *
+ * @return void
+ */
+function aspen_wallet_fluentcrm_missing_notice() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	echo '<div class="notice notice-info"><p>';
+	echo esc_html__( 'FluentCRM integration disabled; core Wallet UI available under Wallet menu and user profiles.', 'aspen-wallet' );
+	echo '</p></div>';
 }
 
 function aspen_wallet_fluentcrm_register_profile_section() {
 	static $registered = false;
 
-	if ( $registered ) {
-		return;
-	}
-
-	if ( ! function_exists( 'FluentCrmApi' ) ) {
-		aspen_wallet_fluentcrm_debug_log( 'Skipped section registration: FluentCrmApi() not available.' );
+	if ( $registered || ! aspen_wallet_fluentcrm_is_available() ) {
 		return;
 	}
 
 	$extender = FluentCrmApi( 'extender' );
-	if ( ! $extender || ! method_exists( $extender, 'addProfileSection' ) ) {
-		aspen_wallet_fluentcrm_debug_log(
-			'Skipped section registration: extender API unavailable.',
-			array(
-				'extender_type' => is_object( $extender ) ? get_class( $extender ) : gettype( $extender ),
-				'has_add_profile_section' => is_object( $extender ) ? method_exists( $extender, 'addProfileSection' ) : false,
-			)
-		);
-		return;
-	}
 
 	$extender->addProfileSection(
 		'aspen_wallet',
@@ -61,40 +65,12 @@ function aspen_wallet_fluentcrm_register_profile_section() {
 	);
 
 	$registered = true;
-
-	aspen_wallet_fluentcrm_debug_log( 'Registered Wallet profile section.', array( 'priority' => 3 ) );
-}
-
-function aspen_wallet_fluentcrm_debug_admin_notice() {
-	if ( ! aspen_wallet_fluentcrm_debug_enabled() || ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
-
-	if ( ! isset( $_GET['page'] ) || 'fluentcrm-admin' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return;
-	}
-
-	$did_init = did_action( 'fluent_crm/after_init' );
-	$has_api  = function_exists( 'FluentCrmApi' );
-
-	echo '<div class="notice notice-info"><p>';
-	echo esc_html__( 'Aspen Wallet debug:', 'aspen-wallet' ) . ' ';
-	echo esc_html( sprintf( 'fluent_crm/after_init fired=%1$d, FluentCrmApi available=%2$s', (int) $did_init, $has_api ? 'yes' : 'no' ) );
-	echo '</p></div>';
 }
 
 function aspen_wallet_fluentcrm_profile_section_callback( $content, $subscriber ) {
 	$content_arr = is_array( $content ) ? $content : array();
 	$user_id     = aspen_wallet_fluentcrm_get_wp_user_id_from_subscriber( $subscriber );
 	$buckets     = aspen_wallet_get_buckets();
-
-	aspen_wallet_fluentcrm_debug_log(
-		'Profile section callback invoked.',
-		array(
-			'user_id'      => $user_id,
-			'bucket_count' => is_array( $buckets ) ? count( $buckets ) : 0,
-		)
-	);
 
 	$content_arr['heading']      = __( 'Wallet Balances', 'aspen-wallet' );
 	$content_arr['content_html'] = aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets );
