@@ -11,7 +11,7 @@ function aspen_wallet_register_admin_hooks() {
 
 function aspen_wallet_register_admin_menu() {
 	add_submenu_page(
-		'options-general.php',
+		'aspen-wallet-users',
 		__( 'Wallet', 'aspen-wallet' ),
 		__( 'Wallet', 'aspen-wallet' ),
 		'manage_options',
@@ -73,7 +73,7 @@ function aspen_wallet_render_admin_page() {
 							<td><code><?php echo esc_html( $row['slug'] ); ?></code></td>
 							<td><?php echo esc_html( $row['description'] ); ?></td>
 							<td>
-								<a class="button button-secondary" href="<?php echo esc_url( add_query_arg( array( 'page' => 'aspen-wallet', 'edit_slug' => $row['slug'] ), admin_url( 'options-general.php' ) ) ); ?>"><?php echo esc_html__( 'Edit', 'aspen-wallet' ); ?></a>
+								<a class="button button-secondary" href="<?php echo esc_url( add_query_arg( array( 'page' => 'aspen-wallet', 'edit_slug' => $row['slug'] ), admin_url( 'admin.php' ) ) ); ?>"><?php echo esc_html__( 'Edit', 'aspen-wallet' ); ?></a>
 								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
 									<?php wp_nonce_field( 'aspen_wallet_delete_bucket' ); ?>
 									<input type="hidden" name="action" value="aspen_wallet_delete_bucket" />
@@ -150,7 +150,7 @@ function aspen_wallet_handle_delete_bucket() {
 }
 
 function aspen_wallet_admin_redirect( $args ) {
-	wp_safe_redirect( add_query_arg( $args, admin_url( 'options-general.php?page=aspen-wallet' ) ) );
+	wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php?page=aspen-wallet' ) ) );
 	exit;
 }
 

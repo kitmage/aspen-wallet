@@ -50,6 +50,7 @@ function aspen_wallet_load_modules() {
 	require_once ASPEN_WALLET_PATH . 'includes/balances.php';
 	require_once ASPEN_WALLET_PATH . 'includes/buckets.php';
 	require_once ASPEN_WALLET_PATH . 'includes/admin.php';
+	require_once ASPEN_WALLET_PATH . 'includes/admin-wallet-users.php';
 	require_once ASPEN_WALLET_PATH . 'includes/woo.php';
 	require_once ASPEN_WALLET_PATH . 'includes/subscriptions.php';
 	require_once ASPEN_WALLET_PATH . 'includes/fluent-booking.php';
@@ -66,6 +67,7 @@ function aspen_wallet_bootstrap() {
 	aspen_wallet_load_modules();
 
 	aspen_wallet_register_admin_hooks();
+	aspen_wallet_register_admin_wallet_users_hooks();
 	aspen_wallet_register_woo_hooks();
 	aspen_wallet_register_subscription_hooks();
 	aspen_wallet_register_fluent_booking_hooks();
