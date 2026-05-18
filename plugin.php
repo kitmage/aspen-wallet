@@ -55,7 +55,7 @@ function aspen_wallet_load_modules() {
 	require_once ASPEN_WALLET_PATH . 'includes/subscriptions.php';
 	require_once ASPEN_WALLET_PATH . 'includes/fluent-booking.php';
 	require_once ASPEN_WALLET_PATH . 'includes/shortcodes.php';
-	require_once ASPEN_WALLET_PATH . 'includes/fluentcrm.php';
+	require_once ASPEN_WALLET_PATH . 'includes/integrations/fluentcrm.php';
 }
 
 /**
