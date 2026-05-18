@@ -131,11 +131,13 @@ function aspen_wallet_fluentcrm_render_wallet_html( $user_id, $buckets ) {
 
 	if ( isset( $_POST['aspen_wallet_fcrm_action'] ) && 'save_wallet' === sanitize_text_field( wp_unslash( $_POST['aspen_wallet_fcrm_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$nonce_ok = isset( $_POST['aspen_wallet_fcrm_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['aspen_wallet_fcrm_nonce'] ) ), 'aspen_wallet_fcrm_save' );
-		if ( $nonce_ok ) {
+		$can_save  = current_user_can( 'manage_options' ) || current_user_can( 'fluentcrm_manage_contacts' );
+		if ( $nonce_ok && $can_save ) {
 			$values = isset( $_POST['aspen_wallet_balances'] ) && is_array( $_POST['aspen_wallet_balances'] ) ? wp_unslash( $_POST['aspen_wallet_balances'] ) : array();
 			foreach ( $buckets as $bucket ) {
 				$slug   = $bucket['slug'];
-				$amount = isset( $values[ $slug ] ) ? aspen_wallet_to_int( $values[ $slug ] ) : 0;
+				$parsed = isset( $values[ $slug ] ) ? aspen_wallet_parse_int_amount( $values[ $slug ] ) : 0;
+				$amount = is_wp_error( $parsed ) ? 0 : (int) $parsed;
 				wallet_set_balance( $user_id, $slug, $amount );
 			}
 		}
