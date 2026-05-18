@@ -25,6 +25,40 @@ function aspen_wallet_to_int( $value ) {
 }
 
 /**
+ * Parse a strict integer amount from raw input.
+ *
+ * Rejects floats, scientific notation, and ambiguous string values.
+ *
+ * @param mixed $raw            Raw input.
+ * @param bool  $allow_negative Allow negative integers.
+ * @return int|WP_Error
+ */
+function aspen_wallet_parse_int_amount( $raw, $allow_negative = false ) {
+	if ( is_bool( $raw ) || is_array( $raw ) || is_object( $raw ) || null === $raw ) {
+		return new WP_Error( 'invalid_amount', __( 'Amount must be a whole integer.', 'aspen-wallet' ) );
+	}
+
+	if ( is_int( $raw ) ) {
+		$value = $raw;
+	} else {
+		$raw = is_string( $raw ) ? wp_unslash( $raw ) : $raw;
+		$raw = is_string( $raw ) ? trim( sanitize_text_field( $raw ) ) : (string) $raw;
+
+		if ( '' === $raw || ! preg_match( '/^-?\d+$/', $raw ) ) {
+			return new WP_Error( 'invalid_amount', __( 'Amount must be a whole integer.', 'aspen-wallet' ) );
+		}
+
+		$value = (int) $raw;
+	}
+
+	if ( ! $allow_negative && $value < 0 ) {
+		return new WP_Error( 'invalid_amount', __( 'Amount cannot be negative.', 'aspen-wallet' ) );
+	}
+
+	return $value;
+}
+
+/**
  * Sanitize bucket slug.
  *
  * @param string $slug Raw slug.
@@ -109,9 +143,16 @@ function wallet_set_balance( $user_id, $bucket, $amount ) {
 	}
 
 	$meta_key = aspen_wallet_bucket_meta_key( $bucket );
-	$amount   = aspen_wallet_to_int( $amount );
+	$parsed   = aspen_wallet_parse_int_amount( $amount );
+	$amount   = is_wp_error( $parsed ) ? 0 : (int) $parsed;
+	$old      = wallet_get_balance( $user_id, $bucket );
+	$updated  = false !== update_user_meta( $user_id, $meta_key, $amount );
 
-	return false !== update_user_meta( $user_id, $meta_key, $amount );
+	if ( $updated && $old !== $amount ) {
+		do_action( 'wallet_balance_updated', $user_id, $bucket, $old, $amount, 'set_balance' );
+	}
+
+	return $updated;
 }
 
 /**

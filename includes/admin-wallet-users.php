@@ -84,12 +84,13 @@ function aspen_wallet_handle_profile_wallet_save( $user_id ) {
 		$label      = $bucket['label'];
 		$raw_amount = isset( $raw_values[ $slug ] ) ? sanitize_text_field( (string) $raw_values[ $slug ] ) : '0';
 
-		if ( ! preg_match( '/^-?\d+$/', $raw_amount ) ) {
+		$parsed = aspen_wallet_parse_int_amount( $raw_amount, true );
+		if ( is_wp_error( $parsed ) ) {
 			$errors[] = sprintf( __( '%1$s must be a whole integer.', 'aspen-wallet' ), $label );
 			continue;
 		}
 
-		$amount = (int) $raw_amount;
+		$amount = (int) $parsed;
 		if ( $amount < 0 ) {
 			$amount = 0;
 		}
@@ -307,10 +308,29 @@ function aspen_wallet_handle_save_user_balances() {
 	$values  = isset( $_POST['balances'] ) ? (array) wp_unslash( $_POST['balances'] ) : array();
 	$buckets = aspen_wallet_get_buckets();
 
+	$errors = array();
 	foreach ( $buckets as $bucket ) {
 		$slug   = $bucket['slug'];
-		$amount = isset( $values[ $slug ] ) ? aspen_wallet_to_int( $values[ $slug ] ) : 0;
+		$label  = isset( $bucket['label'] ) ? $bucket['label'] : $slug;
+		$parsed = isset( $values[ $slug ] ) ? aspen_wallet_parse_int_amount( $values[ $slug ] ) : 0;
+
+		if ( is_wp_error( $parsed ) ) {
+			$errors[] = sprintf( __( '%1$s must be a whole integer.', 'aspen-wallet' ), $label );
+			continue;
+		}
+
+		$amount = (int) $parsed;
 		wallet_set_balance( $user_id, $slug, $amount );
+	}
+
+	if ( ! empty( $errors ) ) {
+		aspen_wallet_user_balances_redirect(
+			array(
+				'user_id'      => $user_id,
+				's'            => isset( $_POST['s'] ) ? sanitize_text_field( wp_unslash( $_POST['s'] ) ) : '',
+				'wallet_errors' => implode( '|', $errors ),
+			)
+		);
 	}
 
 	aspen_wallet_user_balances_redirect(
