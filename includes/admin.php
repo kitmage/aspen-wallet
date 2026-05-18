@@ -28,6 +28,8 @@ function aspen_wallet_render_admin_page() {
 	$errors  = aspen_wallet_parse_notice_messages( isset( $_GET['wallet_errors'] ) ? wp_unslash( $_GET['wallet_errors'] ) : '' );
 	$success = aspen_wallet_parse_notice_messages( isset( $_GET['wallet_success'] ) ? wp_unslash( $_GET['wallet_success'] ) : '' );
 	$editing = isset( $_GET['edit_slug'] ) ? aspen_wallet_sanitize_bucket_slug( wp_unslash( $_GET['edit_slug'] ) ) : '';
+	$delete_check_slug = isset( $_GET['delete_slug'] ) ? aspen_wallet_sanitize_bucket_slug( wp_unslash( $_GET['delete_slug'] ) ) : '';
+	$delete_references = '' !== $delete_check_slug ? aspen_wallet_get_bucket_references( $delete_check_slug ) : array();
 
 	$bucket         = array(
 		'label'       => '',
@@ -46,12 +48,28 @@ function aspen_wallet_render_admin_page() {
 	?>
 	<div class="wrap">
 		<h1><?php echo esc_html__( 'Wallet Buckets', 'aspen-wallet' ); ?></h1>
+		<p class="description"><?php echo esc_html__( 'Bucket balances are stored per user in user meta keys like _user_wallet_bucket_{slug}.', 'aspen-wallet' ); ?></p>
 		<?php foreach ( $errors as $error ) : ?>
 			<div class="notice notice-error"><p><?php echo esc_html( $error ); ?></p></div>
 		<?php endforeach; ?>
 		<?php foreach ( $success as $message ) : ?>
 			<div class="notice notice-success"><p><?php echo esc_html( $message ); ?></p></div>
 		<?php endforeach; ?>
+
+		<?php if ( '' !== $delete_check_slug && ( ! empty( $delete_references['product_grants'] ) || ! empty( $delete_references['event_rules'] ) ) ) : ?>
+			<div class="notice notice-warning">
+				<p><strong><?php echo esc_html__( 'This bucket is in use and cannot be deleted yet.', 'aspen-wallet' ); ?></strong></p>
+				<ul style="list-style: disc; margin-left: 20px;">
+					<?php if ( ! empty( $delete_references['product_grants'] ) ) : ?>
+						<li><?php echo esc_html( sprintf( __( 'Used in WooCommerce product grants on product IDs: %s', 'aspen-wallet' ), implode( ', ', array_map( 'intval', $delete_references['product_grants'] ) ) ) ); ?></li>
+					<?php endif; ?>
+					<?php if ( ! empty( $delete_references['event_rules'] ) ) : ?>
+						<li><?php echo esc_html( sprintf( __( 'Used in Fluent Booking event rules on event IDs: %s', 'aspen-wallet' ), implode( ', ', array_map( 'intval', $delete_references['event_rules'] ) ) ) ); ?></li>
+					<?php endif; ?>
+				</ul>
+				<p><?php echo esc_html__( 'Remove these references first, then delete the bucket.', 'aspen-wallet' ); ?></p>
+			</div>
+		<?php endif; ?>
 
 		<h2><?php echo esc_html__( 'Existing Buckets', 'aspen-wallet' ); ?></h2>
 		<table class="widefat striped">
@@ -74,11 +92,16 @@ function aspen_wallet_render_admin_page() {
 							<td><?php echo esc_html( $row['description'] ); ?></td>
 							<td>
 								<a class="button button-secondary" href="<?php echo esc_url( add_query_arg( array( 'page' => 'aspen-wallet', 'edit_slug' => $row['slug'] ), admin_url( 'admin.php' ) ) ); ?>"><?php echo esc_html__( 'Edit', 'aspen-wallet' ); ?></a>
+								<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" style="display:inline-block;">
+									<input type="hidden" name="page" value="aspen-wallet" />
+									<input type="hidden" name="delete_slug" value="<?php echo esc_attr( $row['slug'] ); ?>" />
+									<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Check usage', 'aspen-wallet' ); ?></button>
+								</form>
 								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
 									<?php wp_nonce_field( 'aspen_wallet_delete_bucket' ); ?>
 									<input type="hidden" name="action" value="aspen_wallet_delete_bucket" />
 									<input type="hidden" name="slug" value="<?php echo esc_attr( $row['slug'] ); ?>" />
-									<button type="submit" class="button button-link-delete"><?php echo esc_html__( 'Delete', 'aspen-wallet' ); ?></button>
+									<button type="submit" class="button button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Delete this bucket? Deletion is blocked if references still exist.', 'aspen-wallet' ) ); ?>');"><?php echo esc_html__( 'Delete', 'aspen-wallet' ); ?></button>
 								</form>
 							</td>
 						</tr>
