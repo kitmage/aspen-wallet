@@ -10,7 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function aspen_wallet_register_fluentcrm_hooks() {
 	if ( ! aspen_wallet_fluentcrm_is_available() ) {
-		add_action( 'admin_notices', 'aspen_wallet_fluentcrm_missing_notice' );
 		return;
 	}
 
@@ -30,21 +29,6 @@ function aspen_wallet_fluentcrm_is_available() {
 	$extender = FluentCrmApi( 'extender' );
 
 	return ( is_object( $extender ) && method_exists( $extender, 'addProfileSection' ) );
-}
-
-/**
- * Render missing-integration admin notice.
- *
- * @return void
- */
-function aspen_wallet_fluentcrm_missing_notice() {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
-
-	echo '<div class="notice notice-info"><p>';
-	echo esc_html__( 'FluentCRM integration disabled; core Wallet UI available under Wallet menu and user profiles.', 'aspen-wallet' );
-	echo '</p></div>';
 }
 
 function aspen_wallet_fluentcrm_register_profile_section() {
