@@ -55,7 +55,6 @@ function aspen_wallet_load_modules() {
 	require_once ASPEN_WALLET_PATH . 'includes/subscriptions.php';
 	require_once ASPEN_WALLET_PATH . 'includes/fluent-booking.php';
 	require_once ASPEN_WALLET_PATH . 'includes/shortcodes.php';
-	require_once ASPEN_WALLET_PATH . 'includes/integrations/fluentcrm.php';
 }
 
 /**
@@ -72,6 +71,5 @@ function aspen_wallet_bootstrap() {
 	aspen_wallet_register_subscription_hooks();
 	aspen_wallet_register_fluent_booking_hooks();
 	aspen_wallet_register_shortcode_hooks();
-	aspen_wallet_register_fluentcrm_hooks();
 }
 add_action( 'plugins_loaded', 'aspen_wallet_bootstrap' );
