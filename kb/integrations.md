@@ -39,10 +39,14 @@ Validation path:
 
 ## FluentCRM
 
-Hook registration is conditional on `defined('FLUENTCRM')`.
+Hook registration checks FluentCRM API availability (`FluentCrmApi('extender')->addProfileSection`) and the compatibility filter `aspen_wallet_enable_fluentcrm_wallet_tab`.
 
 Capabilities:
 
 - Adds `Wallet` tab in contact profile tabs.
 - If contact maps to a WP user, renders integer balance fields per bucket.
+- Renders inline migration links to:
+  - `Wallet > User Balances` (`admin.php?page=aspen-wallet-users`)
+  - the mapped WordPress user profile edit screen.
 - Save operation writes directly to user meta via `wallet_set_balance`.
+- If FluentCRM is unavailable, Wallet still functions via WordPress-native admin screens and a notice is shown to eligible admins.
