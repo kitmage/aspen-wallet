@@ -6,11 +6,12 @@
    - WooCommerce
    - WooCommerce Subscriptions
    - Fluent Booking
-   - FluentCRM
+   - FluentCRM (optional for legacy contact-tab editing)
 2. Activate Aspen Wallet plugin.
 3. Create buckets in **Settings > Wallet**.
-4. Configure product grants.
-5. Configure Fluent Booking event wallet settings.
+4. Configure user balances in **Wallet > User Balances** or **Users > Edit User**.
+5. Configure product grants.
+6. Configure Fluent Booking event wallet settings.
 
 ## Manual QA Scenarios
 
@@ -37,9 +38,10 @@
 - Confirm blocked rendering when combined balance is insufficient.
 - Confirm post-booking debit consumes buckets in configured order.
 
-### 5) FluentCRM edit flow
+### 5) FluentCRM compatibility edit flow (optional)
 
 - Open Wallet tab on mapped contact.
+- Confirm migration links to Wallet admin and WP user edit screen are visible.
 - Save integer balances.
 - Verify user meta updates and values persist.
 
@@ -48,8 +50,9 @@
 - **No wallet fields on products**: WooCommerce may be inactive or hook screen mismatch.
 - **No subscription resets**: Subscriptions plugin unavailable or renewal hook not firing.
 - **No booking restrictions**: Fluent Booking constant/hooks may differ by version.
-- **No FluentCRM wallet tab**: check CRM version and tab hook compatibility.
+- **No FluentCRM wallet tab**: check CRM version/API compatibility, and verify `aspen_wallet_enable_fluentcrm_wallet_tab` filter is not set to `false`.
 - **No balance updates**: confirm contact is linked to a WP user.
+- **FluentCRM inactive**: use `Settings > Wallet`, `Wallet > User Balances`, and `Users > Edit User`; FluentCRM tab is optional and not required.
 
 ## Extension Ideas (Post-MVP)
 
