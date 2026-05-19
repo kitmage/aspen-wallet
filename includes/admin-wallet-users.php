@@ -259,10 +259,10 @@ function aspen_wallet_render_user_balances_page() {
 				<input type="hidden" name="s" value="<?php echo esc_attr( $search_term ); ?>" />
 
 				<table class="widefat striped">
-					<thead><tr><th><?php echo esc_html__( 'Bucket', 'aspen-wallet' ); ?></th><th><?php echo esc_html__( 'Balance (integer)', 'aspen-wallet' ); ?></th><th><?php echo esc_html__( 'FluentCRM', 'aspen-wallet' ); ?></th></tr></thead>
+					<thead><tr><th><?php echo esc_html__( 'Bucket', 'aspen-wallet' ); ?></th><th><?php echo esc_html__( 'Balance (minutes)', 'aspen-wallet' ); ?></th></tr></thead>
 					<tbody>
 					<?php if ( empty( $buckets ) ) : ?>
-						<tr><td colspan="3"><?php echo esc_html__( 'No buckets configured yet.', 'aspen-wallet' ); ?></td></tr>
+						<tr><td colspan="2"><?php echo esc_html__( 'No buckets configured yet.', 'aspen-wallet' ); ?></td></tr>
 					<?php else : ?>
 						<?php foreach ( $buckets as $bucket ) : ?>
 							<?php
@@ -272,7 +272,6 @@ function aspen_wallet_render_user_balances_page() {
 							<tr>
 								<td><strong><?php echo esc_html( $bucket['label'] ); ?></strong><br /><code><?php echo esc_html( $slug ); ?></code></td>
 								<td><input type="number" min="0" step="1" name="balances[<?php echo esc_attr( $slug ); ?>]" value="<?php echo esc_attr( $balance ); ?>" class="small-text" /></td>
-								<td><?php echo wp_kses_post( aspen_wallet_get_fluentcrm_contact_link( $selected ) ); ?></td>
 							</tr>
 						<?php endforeach; ?>
 					<?php endif; ?>
@@ -345,26 +344,4 @@ function aspen_wallet_handle_save_user_balances() {
 function aspen_wallet_user_balances_redirect( $args ) {
 	wp_safe_redirect( add_query_arg( $args, admin_url( 'admin.php?page=aspen-wallet-users' ) ) );
 	exit;
-}
-
-function aspen_wallet_get_fluentcrm_contact_link( WP_User $user ) {
-	if ( ! class_exists( '\\FluentCrm\\App\\Models\\Subscriber' ) ) {
-		return '<em>' . esc_html__( 'FluentCRM unavailable', 'aspen-wallet' ) . '</em>';
-	}
-
-	$subscriber = \FluentCrm\App\Models\Subscriber::where( 'user_id', $user->ID )->first();
-	if ( ! $subscriber || empty( $subscriber->id ) ) {
-		return '<em>' . esc_html__( 'No linked contact', 'aspen-wallet' ) . '</em>';
-	}
-
-	$url = add_query_arg(
-		array(
-			'page'       => 'fluentcrm-admin',
-			'route'      => 'contact',
-			'contact_id' => absint( $subscriber->id ),
-		),
-		admin_url( 'admin.php' )
-	);
-
-	return sprintf( '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>', esc_url( $url ), esc_html__( 'Open contact', 'aspen-wallet' ) );
 }
