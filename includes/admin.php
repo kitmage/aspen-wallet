@@ -7,6 +7,7 @@ function aspen_wallet_register_admin_hooks() {
 	add_action( 'admin_menu', 'aspen_wallet_register_admin_menu' );
 	add_action( 'admin_post_aspen_wallet_save_buckets', 'aspen_wallet_handle_save_buckets' );
 	add_action( 'admin_post_aspen_wallet_delete_bucket', 'aspen_wallet_handle_delete_bucket' );
+	add_action( 'admin_post_aspen_wallet_save_booking_event_rules', 'aspen_wallet_handle_save_booking_event_rules' );
 }
 
 function aspen_wallet_register_admin_menu() {
@@ -17,6 +18,15 @@ function aspen_wallet_register_admin_menu() {
 		'manage_options',
 		'aspen-wallet',
 		'aspen_wallet_render_admin_page'
+	);
+
+	add_submenu_page(
+		'aspen-wallet-users',
+		__( 'Booking Event Rules', 'aspen-wallet' ),
+		__( 'Booking Event Rules', 'aspen-wallet' ),
+		'manage_options',
+		'aspen-wallet-booking-rules',
+		'aspen_wallet_render_booking_event_rules_page'
 	);
 }
 
