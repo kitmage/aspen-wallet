@@ -64,10 +64,25 @@ function aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
 		return $settings;
 	}
 
-	$settings['enabled'] = (bool) get_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, true );
+	$legacy_enabled = (bool) get_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, true );
+	$payment_settings = get_post_meta( $event_id, 'payment_settings', true );
+	$payment_toggle_exists = is_array( $payment_settings ) && array_key_exists( 'enabled', $payment_settings );
+
+	// Migration behavior: once Fluent Booking's payment-settings toggle is available for an event,
+	// it becomes the source of truth so the wallet gate follows the same enable/disable switch as booking payments.
+	if ( $payment_toggle_exists ) {
+		$settings['enabled'] = in_array( strtolower( (string) $payment_settings['enabled'] ), array( '1', 'true', 'yes', 'on' ), true );
+	} else {
+		// Backward compatibility: older events may only have the legacy Aspen flag, so we fall back until
+		// the new payment_settings[enabled] value is saved at least once.
+		$settings['enabled'] = $legacy_enabled;
+	}
+
 	$settings['credit_cost'] = aspen_wallet_to_int( get_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, true ) );
 	$settings['allowed_buckets'] = aspen_wallet_sanitize_allowed_buckets( get_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, true ) );
 
+	// Hard safety requirements: wallet enforcement is only effective when both a positive cost and
+	// at least one allowed bucket are configured, regardless of which enable toggle was used above.
 	if ( $settings['credit_cost'] <= 0 || empty( $settings['allowed_buckets'] ) ) {
 		$settings['enabled'] = false;
 	}
