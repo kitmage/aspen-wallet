@@ -26,12 +26,24 @@ function aspen_wallet_fb_debug_log( $message, $context = array() ) {
 }
 
 function aspen_wallet_register_fluent_booking_hooks() {
-	if ( ! defined( 'FLUENT_BOOKING' ) ) {
-		aspen_wallet_fb_debug_log( 'Hook registration skipped because FLUENT_BOOKING is not defined.' );
+	$fluent_booking_loaded = defined( 'FLUENT_BOOKING' ) || defined( 'FLUENT_BOOKING_VERSION' ) || defined( 'FLUENT_BOOKING_LITE' ) || class_exists( '\\FluentBooking\\App\\App' );
+
+	if ( ! $fluent_booking_loaded ) {
+		aspen_wallet_fb_debug_log( 'Hook registration skipped because Fluent Booking was not detected.', array(
+			'FLUENT_BOOKING'         => defined( 'FLUENT_BOOKING' ),
+			'FLUENT_BOOKING_VERSION' => defined( 'FLUENT_BOOKING_VERSION' ),
+			'FLUENT_BOOKING_LITE'    => defined( 'FLUENT_BOOKING_LITE' ),
+			'app_class'              => class_exists( '\\FluentBooking\\App\\App' ),
+		) );
 		return;
 	}
 
-	aspen_wallet_fb_debug_log( 'Hook registration path reached.' );
+	aspen_wallet_fb_debug_log( 'Hook registration path reached.', array(
+		'FLUENT_BOOKING'         => defined( 'FLUENT_BOOKING' ),
+		'FLUENT_BOOKING_VERSION' => defined( 'FLUENT_BOOKING_VERSION' ),
+		'FLUENT_BOOKING_LITE'    => defined( 'FLUENT_BOOKING_LITE' ),
+		'app_class'              => class_exists( '\\FluentBooking\\App\\App' ),
+	) );
 
 	add_filter( 'fluent_booking/event_payment_settings_defaults', 'aspen_wallet_add_payment_settings_defaults', 20, 2 );
 	add_filter( 'fluent_booking/get_event_payment_settings', 'aspen_wallet_add_payment_settings_fields', 20, 2 );
