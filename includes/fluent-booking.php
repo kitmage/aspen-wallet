@@ -33,9 +33,8 @@ function aspen_wallet_register_fluent_booking_hooks() {
 
 	aspen_wallet_fb_debug_log( 'Hook registration path reached.' );
 
-	add_action( 'fluent_booking_after_event_settings_fields', 'aspen_wallet_render_fluent_booking_event_wallet_settings', 20, 1 );
-	add_action( 'fluent_booking_save_event_settings', 'aspen_wallet_save_fluent_booking_event_wallet_settings', 20, 2 );
-
+	add_filter( 'fluent_booking/event_payment_settings_defaults', 'aspen_wallet_add_payment_settings_defaults', 20, 2 );
+	add_filter( 'fluent_booking/get_event_payment_settings', 'aspen_wallet_add_payment_settings_fields', 20, 2 );
 	add_filter( 'fluent_booking/payment/get_payment_settings', 'aspen_wallet_add_payment_settings_panel_checkbox', 20, 2 );
 	add_filter( 'fluent_booking/payment/payment_settings_before_update_native', 'aspen_wallet_save_payment_settings_panel_checkbox', 20, 1 );
 	add_filter( 'fluent_booking/payment/payment_settings_before_update_woo', 'aspen_wallet_save_payment_settings_panel_checkbox', 20, 1 );
@@ -115,83 +114,21 @@ function aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id ) {
 	return $settings;
 }
 
-function aspen_wallet_render_fluent_booking_event_wallet_settings( $event ) {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		return;
-	}
 
-	$event_id  = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
-	aspen_wallet_fb_debug_log( 'Payment-settings render callback fired.', array( 'event_id' => $event_id ) );
-	$settings  = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
-	$buckets   = aspen_wallet_get_buckets();
-	?>
-	<div class="aspen-wallet-event-settings">
-		<h3><?php esc_html_e( 'Wallet Restriction', 'aspen-wallet' ); ?></h3>
-		<p>
-			<label>
-				<input type="checkbox" name="aspen_wallet_enabled" value="1" <?php checked( $settings['enabled'] ); ?> />
-				<?php esc_html_e( 'Enable Wallet Restriction', 'aspen-wallet' ); ?>
-			</label>
-		</p>
-		<p>
-			<label for="aspen-wallet-credit-cost"><?php esc_html_e( 'Credit Cost (int)', 'aspen-wallet' ); ?></label>
-			<input id="aspen-wallet-credit-cost" type="number" min="0" step="1" name="aspen_wallet_credit_cost" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" />
-		</p>
-		<?php wp_nonce_field( 'aspen_wallet_save_fluent_booking_event_settings', 'aspen_wallet_fb_nonce' ); ?>
-		<p>
-			<label for="aspen-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Buckets (ordered)', 'aspen-wallet' ); ?></label>
-			<select id="aspen-wallet-allowed-buckets" name="aspen_wallet_allowed_buckets[]" multiple="multiple">
-				<?php foreach ( $buckets as $bucket ) : ?>
-					<option value="<?php echo esc_attr( $bucket['slug'] ); ?>" <?php selected( in_array( $bucket['slug'], $settings['allowed_buckets'], true ) ); ?>><?php echo esc_html( $bucket['label'] ); ?></option>
-				<?php endforeach; ?>
-			</select>
-		</p>
-	</div>
-	<?php
+
+function aspen_wallet_add_payment_settings_defaults( $defaults, $calendar_slot ) {
+	$defaults['aspen_wallet_enabled'] = 'no';
+
+	return $defaults;
 }
 
-function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $payload ) {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		aspen_wallet_fb_debug_log( 'Capability check failed for save callback.', array( 'capability' => 'manage_options' ) );
-		return;
-	}
+function aspen_wallet_add_payment_settings_fields( $settings, $calendar_slot ) {
+	$event_id = is_object( $calendar_slot ) && isset( $calendar_slot->id ) ? (int) $calendar_slot->id : 0;
+	$legacy_enabled = (bool) get_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, true );
+	$settings['aspen_wallet_enabled'] = $legacy_enabled ? 'yes' : ( isset( $settings['aspen_wallet_enabled'] ) ? $settings['aspen_wallet_enabled'] : 'no' );
 
-	aspen_wallet_fb_debug_log( 'Capability check passed for save callback.', array( 'capability' => 'manage_options' ) );
-
-	$event_id = (int) $event_id;
-	if ( $event_id <= 0 ) {
-		aspen_wallet_fb_debug_log( 'Save callback fired with invalid event ID.', array( 'event_id' => $event_id ) );
-		return;
-	}
-
-	$nonce = isset( $payload['aspen_wallet_fb_nonce'] ) ? sanitize_text_field( wp_unslash( $payload['aspen_wallet_fb_nonce'] ) ) : '';
-	if ( ! wp_verify_nonce( $nonce, 'aspen_wallet_save_fluent_booking_event_settings' ) ) {
-		aspen_wallet_fb_debug_log( 'Nonce verification failed in save callback.', array( 'event_id' => $event_id ) );
-		return;
-	}
-
-	aspen_wallet_fb_debug_log( 'Nonce verification passed in save callback.', array( 'event_id' => $event_id ) );
-
-	$enabled_input = isset( $payload['aspen_wallet_enabled'] ) ? $payload['aspen_wallet_enabled'] : 0;
-	$cost_input    = isset( $payload['aspen_wallet_credit_cost'] ) ? $payload['aspen_wallet_credit_cost'] : 0;
-	$buckets_input = isset( $payload['aspen_wallet_allowed_buckets'] ) ? $payload['aspen_wallet_allowed_buckets'] : array();
-
-	$enabled = ! empty( $enabled_input );
-	$cost    = aspen_wallet_to_int( $cost_input );
-	$buckets = aspen_wallet_sanitize_allowed_buckets( $buckets_input );
-
-	aspen_wallet_fb_debug_log( 'Save callback fired with sanitized values.', array(
-		'event_id'         => $event_id,
-		'enabled'          => $enabled ? 1 : 0,
-		'credit_cost'      => $cost,
-		'allowed_buckets'  => $buckets,
-	) );
-
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $enabled ? 1 : 0 );
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, $cost );
-	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
+	return $settings;
 }
-
 
 function aspen_wallet_add_payment_settings_panel_checkbox( $data, $calendar_event ) {
 	$event_id = is_object( $calendar_event ) && isset( $calendar_event->id ) ? (int) $calendar_event->id : 0;
@@ -241,6 +178,7 @@ function aspen_wallet_save_payment_settings_panel_checkbox( $settings ) {
 	) );
 
 	update_post_meta( $event_id, ASPEN_WALLET_FB_META_USE_CREDITS_PAYMENT_SETTINGS, $normalized );
+	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $normalized );
 
 	return $settings;
 }
