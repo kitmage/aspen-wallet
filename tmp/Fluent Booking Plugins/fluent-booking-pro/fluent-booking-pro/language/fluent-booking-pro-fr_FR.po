@@ -1,0 +1,1838 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Fluent Booking Pro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-26 16:40+0000\n"
+"PO-Revision-Date: 2025-12-31 12:24+0000\n"
+"Last-Translator: Marzan\n"
+"Language-Team: French (France)\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.6; wp-6.4.3\n"
+"X-Domain: fluent-booking-pro"
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:512
+#, php-format
+msgid "%s Payment Failed"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:501
+#, php-format
+msgid "%s Payment Pending"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:85
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:81
+msgid "1 minute"
+msgstr "1 minute"
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:87
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:83
+msgid "10 minutes"
+msgstr "10 minutes"
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:88
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:84
+msgid "15 minutes"
+msgstr "15 minutes"
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:86
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:82
+msgid "5 minutes"
+msgstr "5 minutes"
+
+#: app/Http/Controllers/TeamController.php:130
+msgid "Access Permissions has been updated successfully"
+msgstr "Les autorisations d'accès ont été mises à jour avec succès"
+
+#: app/Services/Integrations/Calendars/Google/GoogleCalendar.php:128
+#: app/Services/Integrations/Calendars/Outlook/OutlookCalendar.php:91
+msgid "Access Token Refreshed"
+msgstr "Renouvellement du jeton d'accès"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:83
+msgid "Account SID"
+msgstr "SID du compte"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:713
+msgid "Added to Google calendar"
+msgstr "Ajouté au calendrier Google"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:600
+msgid "Added to Outlook calendar"
+msgstr "Ajouté au calendrier Outlook"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:101
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:106
+msgid "All Hosts Need to "
+msgstr ""
+
+#: app/Hooks/Handlers/UploadHandler.php:73
+msgid "Allowed image types does not match"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:568
+#, php-format
+msgid "Amount %s refunded successfully. Transaction ID: %s "
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/API/API.php:31
+msgid "API Error: "
+msgstr "Erreur API :"
+
+#. %s is the event id of apple calendar
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:362
+#, php-format
+msgid "Aplle calendar event has been created. EventID: %s"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:117
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:114
+msgid "App Specific Password"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:24
+msgid "Apple Calendar"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:370
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:415
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:475
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:547
+msgid "Apple Calendar API Error"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:57
+msgid "Apple Calendar API Error:"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:360
+msgid "Apple Calendar event created"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:408
+msgid "Apple calendar event has been deleted"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:468
+msgid "Apple calendar event has been updated"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:407
+msgid "Apple event has been deleted"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:467
+msgid "Apple event has been updated"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:113
+msgid "Apple ID (Email)"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:99
+msgid "Apply"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:98
+msgid "Apply Here"
+msgstr ""
+
+#: app/Services/Integrations/Woo/Bootstrap.php:93
+msgid "Appointment"
+msgstr "Nomination"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:88
+msgid "Auth Token"
+msgstr "Jeton d'authentification"
+
+#: app/Modules/SingleEvent/SingleEvent.php:41
+msgid "Availability"
+msgstr "Disponibilité"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:833
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:855
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:866
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:191
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:208
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:219
+msgid "Back to Calendars Configuration"
+msgstr "Retour à la configuration des calendriers"
+
+#. 1: Booking ID, 2: Opening link tag, 3: Closing link tag
+#: app/Services/Integrations/Woo/Bootstrap.php:298
+#, fuzzy, php-format
+#| msgid "Booking #%1s status changed to cancelled. %2sView Booking%3s"
+msgid "Booking #%1$s status changed to cancelled. %2$sView Booking%3$s"
+msgstr ""
+"Le statut de la réservation #%1s est passé à annulé. %2sVoir réservation%3s"
+
+#. Notification message for the change of booking status to scheduled. %1$s is the booking ID, %2$s is the full booking date and time with timezone, %3$s is a link to view the booking
+#: app/Services/Integrations/Woo/Bootstrap.php:263
+#, fuzzy, php-format
+#| msgid "Booking #%1s status changed to scheduled at %2s. %3sView Booking%4s"
+msgid "Booking #%1$s status changed to scheduled at %2$s. %3$sView Booking%4$s"
+msgstr ""
+"Le statut de la réservation #%1s a été modifié pour devenir programmé à %2s. "
+"%3sVoir la réservation%4s"
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:220
+msgid "Booking Approval Request to Host (SMS to Organizer)"
+msgstr ""
+
+#: app/Http/Controllers/WebhookController.php:142
+msgid "Booking Canceled"
+msgstr "Réservation annulée"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:404
+msgid "Booking Cancellation SMS has been sent to the Attendee"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:427
+msgid "Booking Cancellation SMS has been sent to the host"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:180
+msgid "Booking Cancelled by Attendee (SMS to Organizer)"
+msgstr "Réservation annulée par le participant (SMS à l'organisateur)"
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:190
+msgid "Booking Cancelled by Organizer (SMS to Attendee)"
+msgstr "Réservation annulée par l'organisateur (SMS au participant)"
+
+#: app/Http/Controllers/WebhookController.php:146
+msgid "Booking Completed"
+msgstr "Réservation effectuée"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:252
+msgid "Booking Confirmation SMS has been sent to attendee"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:273
+msgid "Booking Confirmation SMS has been sent to host"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:127
+msgid "Booking Confirmation SMS to Attendee"
+msgstr "SMS de confirmation de réservation au participant"
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:137
+msgid "Booking Confirmation SMS to Organizer (You)"
+msgstr "SMS de confirmation de réservation à l'organisateur (vous)"
+
+#: app/Http/Controllers/WebhookController.php:138
+msgid "Booking Confirmed"
+msgstr "Réservation confirmée"
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:238
+msgid "Booking Declined by Organizer (SMS to Attendee)"
+msgstr ""
+
+#: app/Services/Integrations/Woo/Bootstrap.php:141
+msgid "Booking Details"
+msgstr "Détails de la réservation"
+
+#: app/Http/Controllers/WebhookController.php:154
+msgid "Booking Rejected"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:313
+msgid "Booking Reminder SMS has been sent to attendee"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:333
+msgid "Booking Reminder SMS has been sent to host"
+msgstr ""
+
+#: app/Http/Controllers/WebhookController.php:150
+msgid "Booking Rescheduled"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:200
+msgid "Booking Rescheduled by Attendee (SMS to Organizer)"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:210
+msgid "Booking Rescheduled by Organizer (SMS to Attendee)"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:510
+msgid "Booking Rescheduling SMS has been sent to the Attendee"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:489
+msgid "Booking Rescheduling SMS has been sent to the host"
+msgstr ""
+
+#. Notification message indicating that the booking status could not be changed because it is in a certain status. %1$s is the current booking status, %2$s is a link to view the order
+#: app/Services/Integrations/Woo/Bootstrap.php:224
+#, php-format
+msgid ""
+"Booking status could not be changed as it is in %1$s status. %2$sView "
+"Order%3$s"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:229
+msgid "Booking Submission Confirmation (SMS to Attendee)"
+msgstr ""
+
+#: app/Http/Controllers/TransactionController.php:63
+msgid "by"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:90
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:86
+msgid "Caching Time"
+msgstr "Durée de la mise en cache"
+
+#: app/Hooks/Handlers/UploadHandler.php:43
+msgid "Calendar Event not found"
+msgstr ""
+
+#: app/Http/Controllers/PaymentMethodController.php:123
+msgid "Calendar not found"
+msgstr "Calendrier non trouvé"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:402
+#: app/Services/Integrations/Twilio/Bootstrap.php:425
+msgid "Cancellation SMS Sent Successfully"
+msgstr "SMS d'annulation envoyé avec succès"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:293
+msgid "Cancelled by WooCommerce Order"
+msgstr "Annulé par la commande WooCommerce"
+
+#: app/Modules/SingleEvent/SingleEvent.php:119
+msgid "click here"
+msgstr "cliquez ici"
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:56
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:64
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:57
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:60
+msgid "Click Here to Review"
+msgstr "Cliquez ici pour lire l'article"
+
+#: boot/app.php:51
+msgid "Click here to update"
+msgstr ""
+
+#. %s is the name of the calendar title.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:122
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:119
+#, php-format
+msgid "Configure %s to sync your events"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:152
+msgid "Configure Google Calendar/Meet to sync your events"
+msgstr "Configurer Google Agenda/Meet pour synchroniser vos événements"
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:147
+msgid "Configure Meeting Reminder to Attendee"
+msgstr "Configurer le rappel de la réunion au participant"
+
+#: app/Services/Integrations/Twilio/TwilioHelper.php:163
+msgid "Configure Meeting Reminder to Organizer (You)"
+msgstr "Configurer le rappel de réunion à l'organisateur (vous)"
+
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:187
+msgid ""
+"Configure Offline to accept payments on your booking events and monetize "
+"your time slots"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:263
+msgid ""
+"Configure Paypal to accept payments on your booking events and monetize your "
+"time slots"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:441
+msgid ""
+"Configure stripe to accept payments on your booking events and monetize your "
+"time slots"
+msgstr ""
+"Configurez Stripe pour accepter les paiements sur vos événements de "
+"réservation et monétiser vos créneaux horaires"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:98
+msgid ""
+"Configure Twilio API to send SMS/WhatsApp notifications on booking events"
+msgstr ""
+"Configurer l'API Twilio pour envoyer des notifications SMS/WhatsApp sur les "
+"événements de réservation"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:83
+msgid "Connect Google Meet First"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:79
+msgid "Connect Outlook First"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:110
+msgid "Connect to Apple Server"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:114
+msgid "Connect to Nextcloud Server"
+msgstr ""
+
+#. %s is the name of the calendar title.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:124
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:121
+#, php-format
+msgid "Connect with %s"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:115
+msgid "Connect with Apple Calendar"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:118
+msgid "Connect with Nextcloud Calendar"
+msgstr ""
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:62
+msgid "Connect Zoom Account First"
+msgstr ""
+
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:67
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:105
+msgid "Coupon code is required"
+msgstr ""
+
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:83
+msgid "Coupon created successfully"
+msgstr ""
+
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:143
+msgid "Coupon deleted successfully"
+msgstr ""
+
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:128
+msgid "Coupon updated successfully"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:36
+#: app/Http/Controllers/CalendarController.php:130
+#: app/Http/Controllers/CalendarController.php:183
+#: app/Modules/SingleEvent/SingleEventController.php:73
+msgid "Data has been updated"
+msgstr "Les données ont été mises à jour"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:148
+msgid "Date & Time:"
+msgstr "Date et heure :"
+
+#: app/Http/Controllers/ZoomController.php:40
+msgid "Deleted user"
+msgstr "Utilisateur supprimé"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:291
+msgid "Disable Paypal IPN Verification"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:142
+msgid "documentation"
+msgstr "la documentation"
+
+#: app/Services/ReceiptHelper.php:164
+msgid "Email"
+msgstr "Courriel"
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:76
+msgid "Enable Apple Calendar Integration"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:965
+msgid "Enable Google Calendar Notification"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:898
+msgid "Enable Microsoft Teams (Requires work/school account)"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:97
+msgid "Enable MS Teams From Outlook Settings"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:75
+msgid "Enable Nextcloud Calendar Integration"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:190
+msgid "Enable Offline payment for booking payment"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:266
+msgid "Enable Paypal payment for booking payment"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:444
+#, fuzzy
+#| msgid "Enable Stripe payment payment for booking payment"
+msgid "Enable Stripe payment for booking payment"
+msgstr "Activer le paiement Stripe pour le paiement des réservations"
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:95
+msgid "Enable/Disable Apple Calendar to sync your events"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:99
+msgid "Enable/Disable Nextcloud Calendar to sync your events"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:84
+msgid "Enter Twilio Account SID"
+msgstr "Saisir le SID du compte Twilio"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:89
+msgid "Enter Twilio API Auth Token"
+msgstr "Saisir le jeton d'authentification de l'API Twilio"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:74
+msgid "Enter Twilio Sender SMS Number"
+msgstr "Saisir le numéro de SMS de l'expéditeur Twilio"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:79
+msgid "Enter Twilio Sender WhatsApp Number"
+msgstr "Entrez le numéro WhatsApp de l'expéditeur Twilio"
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:109
+msgid "Enter Your Account ID"
+msgstr "Saisissez l'identifiant de votre compte"
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:114
+msgid "Enter Your App Client ID"
+msgstr "Saisissez votre identifiant de client d'application"
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:119
+msgid "Enter Your App Secret Key"
+msgstr "Entrez la clé secrète de votre application"
+
+#: app/Http/Controllers/CalendarController.php:65
+msgid "Event confirmation type field is invalid"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:64
+msgid "Event confirmation type field is required"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:702
+msgid "Event in outlook has been updated with new dates"
+msgstr "L'événement en perspective a été mis à jour avec de nouvelles dates"
+
+#: app/Http/Controllers/CalendarController.php:63
+msgid "Event multiple booking limit field is required"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:62
+msgid "Event query string field is required"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:61
+msgid "Event redirect url field is required"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:60
+msgid "Event slug field is required"
+msgstr ""
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:667
+#, php-format
+msgid "Failed to add attendee in Google calendar. API Response: %s"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:830
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:188
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:216
+msgid "Failed to connect Calendar API"
+msgstr "Échec de la connexion à l'API Calendrier"
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:701
+#, php-format
+msgid "Failed to connect with Google calendar API. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:336
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:526
+#, php-format
+msgid "Failed to connect with google calendar API. API Response: %s"
+msgstr ""
+
+#. API response message when failed to connect with Outlook calendar API
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:395
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:569
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:588
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:677
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:692
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:726
+#, php-format
+msgid "Failed to connect with Outlook calendar API. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Apple Calendar API.
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:372
+#, php-format
+msgid "Failed to create event in Apple calendar. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:433
+#, php-format
+msgid "Failed to create event in Google calendar. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Nextcloud Calendar API.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:381
+#, php-format
+msgid "Failed to create event in Nextcloud calendar. API Response: %s"
+msgstr ""
+
+#. API response message when failed to create event in Outlook calendar
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:483
+#, php-format
+msgid "Failed to create event in Outlook calendar. API Response: %s"
+msgstr ""
+
+#. Notification message for the failure to create a meeting with Zoom API. %s is the error message returned by the API
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:141
+#, php-format
+msgid "Failed to create meeting with Zoom API. API Response: %1s"
+msgstr ""
+
+#. %s is the error message returned by the Apple Calendar API.
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:417
+#, php-format
+msgid "Failed to delete event in Apple calendar. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Nextcloud Calendar API.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:426
+#, php-format
+msgid "Failed to delete event in Nextcloud calendar. API Response: %s"
+msgstr ""
+
+#. API response message when failed to delete event in Outlook calendar
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:747
+#, php-format
+msgid "Failed to delete event in Outlook calendar. API Response: %s"
+msgstr ""
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:209
+msgid "Failed to delete meeting with Zoom API"
+msgstr "Echec de la suppression de la réunion avec Zoom API"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:148
+msgid "Failed to send sms with Twilio API"
+msgstr "Échec de l'envoi de sms avec l'API Twilio"
+
+#: app/Services/Integrations/Webhook/WebhookIntegration.php:164
+msgid "Failed to send webhook"
+msgstr "Échec de l'envoi du webhook"
+
+#: app/Services/Integrations/Webhook/WebhookIntegration.php:153
+#: app/Services/Integrations/Webhook/WebhookIntegration.php:157
+msgid "Failed to send webhook to"
+msgstr "Échec de l'envoi du webhook à"
+
+#. %s is the error message returned by the Apple Calendar API.
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:477
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:549
+#, php-format
+msgid "Failed to update event in Apple calendar. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:605
+#, php-format
+msgid "Failed to update event in Google calendar. API Response: %s"
+msgstr ""
+
+#. %s is the error message returned by the Nextcloud Calendar API.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:486
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:558
+#, php-format
+msgid "Failed to update event in Nextcloud calendar. API Response: %s"
+msgstr ""
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:315
+msgid "Failed to update meeting with Zoom API"
+msgstr "Echec de la mise à jour de la réunion avec Zoom API"
+
+#: app/Hooks/Handlers/UploadHandler.php:51
+msgid "Field not found"
+msgstr ""
+
+#: app/Hooks/Handlers/UploadHandler.php:101
+msgid "File deleted successfully"
+msgstr ""
+
+#: app/Services/ReceiptHelper.php:156
+msgid "First Name"
+msgstr "Prénom"
+
+#: boot/app.php:51
+msgid "FluentBooking base plugin needs to be updated to the latest version."
+msgstr ""
+
+#. Name of the plugin
+#, fuzzy
+#| msgid "Fluent Booking Pro"
+msgid "FluentBooking Pro"
+msgstr "Fluent Booking Pro"
+
+#: app/Hooks/Handlers/FrontendRenderer.php:25
+msgid "Frontend Portal"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:93
+msgid "Go to the documentation article"
+msgstr "Aller à l'article de la documentation"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:863
+msgid "Google API Error"
+msgstr "Erreur de l'API Google"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:831
+msgid "Google API Response Error:"
+msgstr "Erreur de réponse de l'API Google :"
+
+#: app/Http/Controllers/IntegrationSettingsController.php:44
+msgid "Google Calendar"
+msgstr "Google Agenda"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:24
+msgid "Google Calendar / Meet"
+msgstr "Google Calendar / Meet"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:334
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:431
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:524
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:603
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:665
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:699
+msgid "Google Calendar API Error"
+msgstr "Erreur de l'API Google Calendar"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:64
+msgid "Google Calendar API Error:"
+msgstr "Erreur de l'API Google Calendar :"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:459
+msgid "Google Calendar event created"
+msgstr "Création d'un événement Google Calendar"
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:461
+#, php-format
+msgid "Google calendar event has been created. %s"
+msgstr ""
+
+#. %s is the error message returned by the Google Calendar API.
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:625
+#, php-format
+msgid "Google calendar event has been updated. %s"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:623
+msgid "Google Calendar event updated"
+msgstr "Mise à jour de l'événement Google Calendar"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:146
+msgid ""
+"Google Calendar/Meet integration is configured by wp-config.php constants. "
+"No action required here"
+msgstr ""
+"L'intégration de Google Calendar/Meet est configurée par les constantes de "
+"wp-config.php. Aucune action n'est requise ici"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:113
+msgid "Google Meet"
+msgstr "Google Meet"
+
+#: app/Modules/SingleEvent/SingleEventController.php:46
+msgid "Group event can only have one time slot"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:714
+msgid "Guest has been added to Google calendar event"
+msgstr "L'invité a été ajouté à l'événement du calendrier Google"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:601
+msgid "Guest has been added to outlook calendar event"
+msgstr "L'invité a été ajouté à l'événement du calendrier Outlook"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:722
+msgid "Guest has been removed from Google calendar event"
+msgstr "L'invité a été supprimé de l'événement de l'agenda Google"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:609
+msgid "Guest has been removed from outlook calendar event"
+msgstr "L'invité a été supprimé de l'événement du calendrier Outlook"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:969
+msgid "Guests can see other guests of the slot"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:97
+msgid "Have a Coupon?"
+msgstr ""
+
+#. URI of the plugin
+#. Author URI of the plugin
+msgid "https://fluentbooking.com"
+msgstr "https://fluentbooking.com"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:293
+msgid ""
+"If you are unable to use Payment Data Transfer and payments are not getting "
+"marked as complete, then check this box. This forces the site to use a "
+"slightly less secure method of verifying purchases."
+msgstr ""
+
+#: app/Http/Controllers/IntegrationSettingsController.php:189
+msgid "Integration Feed Settings could not be found. Driver missing!"
+msgstr ""
+"Les paramètres du flux d'intégration n'ont pas été trouvés. Pilote manquant !"
+
+#: app/Modules/Coupon/CouponService.php:119
+msgid "Invalid coupon code"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/NextCloudHelper.php:52
+#: app/Services/Integrations/Calendars/AppleCalendar/AppleHelper.php:45
+msgid "Invalid credentials"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/ConnectConfig.php:73
+msgid "Invalid Stripe Request. Please configure stripe payment gateway again"
+msgstr ""
+"Demande Stripe non valide. Veuillez configurer à nouveau la passerelle de "
+"paiement Stripe"
+
+#: app/Services/ReceiptHelper.php:34
+msgid "Invalid submission. No receipt found"
+msgstr "Soumission non valide. Aucun reçu n'a été trouvé"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:357
+msgid "Invoice for Order"
+msgstr "Facture pour la commande"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:201
+msgid "invoice not found"
+msgstr "facture introuvable"
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:95
+msgid "Item"
+msgstr "Objet"
+
+#: app/Services/ReceiptHelper.php:131
+msgid "Items Details"
+msgstr "Détails des articles"
+
+#: app/Services/ReceiptHelper.php:160
+msgid "Last Name"
+msgstr "Nom de famille"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:280
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:458
+msgid "Live Mode"
+msgstr "Mode Live"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:142
+msgid ""
+"Login to your Google account, go to Google Cloud Console, create a project, "
+"complete OAuth Consent screen process, click on Create Credentials, and you "
+"will get your client id and secret key. If you get the ID and Keys for "
+"Google Calendar, Google Meet will be integrated automatically. For full "
+"details read the"
+msgstr ""
+"Connectez-vous à votre compte Google, accédez à Google Cloud Console, créez "
+"un projet, complétez le processus de l'écran de consentement OAuth, cliquez "
+"sur Create Credentials, et vous obtiendrez votre identifiant client et votre "
+"clé secrète. Si vous obtenez l'ID et les clés pour Google Calendar, Google "
+"Meet sera intégré automatiquement. Pour plus de détails, lisez le"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:853
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:206
+msgid ""
+"Looks like you did not allow the required scopes. Please try again with the "
+"following scopes:"
+msgstr ""
+"Il semble que vous n'ayez pas autorisé les champs d'application requis. "
+"Veuillez réessayer avec les champs d'application suivants :"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:145
+msgid "Meeting Info:"
+msgstr "Informations sur la réunion :"
+
+#: app/Http/Controllers/TeamController.php:162
+msgid "Member has been deleted successful"
+msgstr "Le membre a été supprimé avec succès"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:118
+msgid "MS Teams"
+msgstr ""
+
+#: app/Http/Controllers/TeamController.php:142
+msgid "New member has been added with the selected access permissions"
+msgstr ""
+"Un nouveau membre a été ajouté avec les autorisations d'accès sélectionnées"
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:23
+msgid "Nextcloud Calendar"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:379
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:424
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:484
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:556
+msgid "Nextcloud Calendar API Error"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:56
+msgid "Nextcloud Calendar API Error:"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:370
+msgid "Nextcloud Calendar event created"
+msgstr ""
+
+#. %s is the error message returned by the Nextcloud Calendar API.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:372
+#, php-format
+msgid "Nextcloud calendar event has been created. EventID: %s"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:417
+msgid "Nextcloud calendar event has been deleted"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:477
+msgid "Nextcloud calendar event has been updated"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:416
+msgid "Nextcloud event has been deleted"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:476
+msgid "Nextcloud event has been updated"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:116
+msgid "Nextcloud ID (Username/ Email)"
+msgstr ""
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:49
+msgid "No zoom credentials found"
+msgstr "Aucun identifiant de zoom n'a été trouvé"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:936
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:871
+msgid "Note: "
+msgstr "Remarque :"
+
+#: app/Http/Controllers/TwilioController.php:52
+msgid "Notifications has been saved"
+msgstr "Notifications a été sauvegardé"
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:198
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:18
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:226
+#: app/Services/Integrations/PaymentMethods/Offline/OfflineSettings.php:27
+msgid "Offline Payment"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:186
+msgid "Offline Payments"
+msgstr ""
+
+#. 1: order number 2: order date 3: order status
+#: app/Services/Integrations/Woo/Bootstrap.php:335
+#, php-format
+msgid "Order #%1$s was placed on %2$s and is currently %3$s."
+msgstr "La commande #%1$s a été passée le %2$s et est actuellement %3$s."
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:127
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:95
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:244
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:417
+msgid "Order has been placed successfully"
+msgstr "La commande a été passée avec succès"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:351
+msgid "Order Summary"
+msgstr "Résumé de la commande"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:105
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:110
+msgid "Organizer Needs to "
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:189
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:217
+msgid "Outlook API Response Error:"
+msgstr "Erreur de réponse de l'API Outlook :"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:23
+msgid "Outlook Calendar / MS Teams"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:393
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:481
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:567
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:586
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:675
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:690
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:724
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:745
+msgid "Outlook Calendar API Error"
+msgstr "Erreur de l'API du calendrier Outlook"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:60
+msgid "Outlook Calendar API Error:"
+msgstr "Erreur de l'API du calendrier Outlook :"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:509
+msgid "Outlook Calendar event created"
+msgstr "Création d'un événement dans le calendrier Outlook"
+
+#. Notification message for the creation of an Outlook calendar event. %s is a link to view the event on Outlook Calendar
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:511
+#, php-format
+msgid "Outlook calendar event has been created. %s"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:757
+msgid "Outlook calendar event has been deleted"
+msgstr "L'événement du calendrier Outlook a été supprimé"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:756
+msgid "Outlook event has been deleted"
+msgstr "L'événement Outlook a été supprimé"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:701
+msgid "Outlook Event Updated"
+msgstr "Mise à jour de l'événement Outlook"
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:196
+#: app/Services/Integrations/PaymentMethods/Stripe/StripeSettings.php:49
+msgid "Pay with Card (Stripe)"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:55
+msgid "Pay with Offline"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/PaypalSettings.php:32
+msgid "Pay with PayPal"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:197
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:256
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:180
+msgid "Pay with Paypal"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:434
+msgid "Pay with Stripe"
+msgstr "Payer avec Stripe"
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:608
+msgid "Pay with:"
+msgstr "Payer avec :"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:217
+msgid "Payment failed due to invalid amount in Paypal IPN"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:212
+msgid "Payment failed due to invalid currency in Paypal IPN"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/API/IPN.php:100
+msgid "Payment failed for paypal IPN error"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/API/IPN.php:110
+msgid "Payment failed for paypal IPN verification"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:125
+msgid "Payment for Order"
+msgstr "Paiement de la commande"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:346
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:347
+msgid ""
+"Payment is being reviewed by PayPal staff as high-risk or in possible "
+"violation of government regulations"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:351
+msgid ""
+"Payment is pending for unknown reasons. Contact PayPal support for assistance"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:271
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:195
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:449
+msgid "Payment Label"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:342
+msgid "Payment made via eCheck and will clear automatically in 5-8 days"
+msgstr ""
+
+#: app/Http/Controllers/TransactionController.php:63
+msgid "Payment marked as"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:480
+msgid "Payment Marked as paid"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:356
+msgid "Payment marked as pending"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:549
+msgid "Payment Modal is opening, Please complete the payment"
+msgstr "La fenêtre de paiement s'ouvre, veuillez compléter le paiement"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:277
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:455
+msgid "Payment Mode"
+msgstr "Mode de paiement"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:344
+msgid ""
+"Payment must be accepted manually through PayPal due to international "
+"account regulations"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:345
+msgid ""
+"Payment received in non-shop currency and must be accepted manually through "
+"PayPal"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:567
+msgid "Payment Refunded Successfully"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:343
+msgid ""
+"Payment requires a confirmed customer address and must be accepted manually "
+"through PayPal"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:490
+msgid "Payment Successfully Completed"
+msgstr ""
+
+#: app/Http/Controllers/TransactionController.php:62
+msgid "Payment Successfully Marked as"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:140
+msgid "Payment Summary"
+msgstr "Récapitulatif des paiements"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:348
+msgid "Payment was sent to non-confirmed or non-registered email address."
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:20
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:375
+msgid "Paypal"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:350
+msgid ""
+"PayPal account is not verified. Verify account in order to accept this "
+"payment"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:349
+msgid "PayPal account must be upgraded before this payment can be accepted"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:286
+msgid "Paypal Email"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/API/IPN.php:99
+msgid "Paypal IPN Error"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/API/IPN.php:109
+msgid "Paypal IPN Not Verified"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:262
+msgid "Paypal Payments"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:55
+msgid ""
+"Paypal's payments platform lets you accept credit cards, debit cards, and "
+"popular payment methods around the world—all with a single integration"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:600
+msgid "Please activate payment first!"
+msgstr "Veuillez d'abord activer le paiement !"
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:618
+msgid "Please active at least one payment method!"
+msgstr "Veuillez activer au moins un mode de paiement !"
+
+#: app/Modules/SingleEvent/SingleEvent.php:119
+msgid "Please add the availability of this event"
+msgstr ""
+
+#: app/Http/Controllers/PaymentMethodController.php:42
+msgid "Please connect your Stripe account first."
+msgstr "Veuillez d'abord connecter votre compte Stripe."
+
+#: app/Http/Controllers/PaymentMethodController.php:155
+msgid "Please enable at least one payment method"
+msgstr ""
+
+#: app/Http/Controllers/PaymentMethodController.php:50
+msgid "Please enter a valid email address"
+msgstr ""
+
+#: app/Hooks/Handlers/FrontendRenderer.php:303
+msgid "Please login to view the bookings"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:93
+msgid ""
+"Please read the step-by-step documentation to setup Account SID and Auth "
+"Token and get the Sender Numbers for your app."
+msgstr ""
+"Veuillez lire la documentation étape par étape pour configurer l'Account SID "
+"et l'Auth Token et obtenir les numéros d'expéditeur pour votre application."
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:157
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:184
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:154
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:254
+msgid "Please remove the connection and reconnect again."
+msgstr "Veuillez retirer la connexion et la reconnecter."
+
+#: app/Http/Controllers/PaymentMethodController.php:148
+msgid "Please select a payment method"
+msgstr "Veuillez sélectionner un mode de paiement"
+
+#: app/Http/Controllers/PaymentMethodController.php:166
+msgid "Please select a product"
+msgstr "Veuillez sélectionner un produit"
+
+#: app/Hooks/Handlers/GlobalPaymentHandler.php:128
+msgid "Please select a valid payment method"
+msgstr ""
+
+#: app/Modules/SingleEvent/SingleEventController.php:38
+msgid "Please select at least one time slot"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:95
+msgid "Price"
+msgstr "Prix"
+
+#: app/Http/Controllers/PaymentMethodController.php:173
+msgid "Product not found. Please select a product"
+msgstr "Produit non trouvé. Veuillez sélectionner un produit"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:473
+msgid "Provider"
+msgstr "Fournisseur"
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:69
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:70
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:147
+msgid "Read the documentation"
+msgstr "Lire la documentation"
+
+#: app/Http/Controllers/CalendarController.php:150
+msgid "Recurring config enabled field is required"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:154
+msgid "Recurring config frequency field is invalid"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:153
+msgid "Recurring config frequency field is required"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:152
+msgid "Recurring config interval field is required"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:151
+msgid "Recurring config max count field is required"
+msgstr ""
+
+#: app/Hooks/Handlers/RecurringEventHandler.php:62
+msgid "Recurring count field is required"
+msgstr ""
+
+#: app/Hooks/Handlers/RecurringEventHandler.php:63
+msgid "Recurring count field must be at least 1"
+msgstr ""
+
+#: app/Hooks/Handlers/RecurringEventHandler.php:64
+msgid "Recurring count field must be at most "
+msgstr ""
+
+#: app/Services/Integrations/Woo/Bootstrap.php:73
+msgid "Redirect to WooCommerce checkout page"
+msgstr "Redirection vers la page de paiement de WooCommerce"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:311
+#: app/Services/Integrations/Twilio/Bootstrap.php:331
+msgid "Reminder SMS Sent Successfully"
+msgstr "SMS de rappel envoyé avec succès"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:721
+msgid "Removed from Google calendar"
+msgstr "Supprimé de l'agenda Google"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:608
+msgid "Removed from Outlook calendar"
+msgstr "Supprimé du calendrier Outlook"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:852
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:205
+msgid "Required scopes missing"
+msgstr "Absence des champs d'application requis"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:487
+#: app/Services/Integrations/Twilio/Bootstrap.php:508
+msgid "Rescheduling SMS Sent Successfully"
+msgstr "SMS de reprogrammation envoyé avec succès"
+
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:68
+#: app/Modules/Coupon/Http/Controllers/CouponController.php:106
+msgid "Same coupon code already exists"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:279
+msgid "Sandbox Mode"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:154
+msgid "Save Google API Configuration"
+msgstr "Enregistrer la configuration de l'API Google"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:105
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:101
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:97
+msgid "Save Settings"
+msgstr "Sauvegarder les paramètres"
+
+#. Explanation for the cache duration setting. %1$s is the calendar title, %2$s is the calendar title repeated.
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:92
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:88
+#, php-format
+#| msgid ""
+#| "Select for how many minutes the Google Calendar event API call will be "
+#| "cached. Recommended 5/10 minutes. If you add lots of manual events in "
+#| "google then you may lower the value"
+msgid ""
+"Select for how many minutes the %1$s event API call will be cached. "
+"Recommended 5/10 minutes. If you add lots of manual events in %2$s then you "
+"may lower the value"
+msgstr ""
+"Sélectionnez le nombre de minutes pendant lesquelles l’appel à l’API de "
+"l’événement %1$s sera mis en cache. La valeur recommandée est de 5/10 "
+"minutes. Si vous ajoutez beaucoup d’événements manuels dans %2$s, vous "
+"pouvez réduire cette valeur."
+
+#: app/Services/Integrations/PaymentMethods/Stripe/ConnectConfig.php:173
+msgid "Selected Account does not exist"
+msgstr "Le compte sélectionné n'existe pas"
+
+#: app/Http/Controllers/WebhookController.php:102
+msgid "Selected Webhook has been deleted"
+msgstr "Le Webhook sélectionné a été supprimé"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:93
+msgid "Set Google Event Creat First"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:89
+msgid "Set Outlook Event Creat First"
+msgstr ""
+
+#: app/Http/Controllers/PaymentMethodController.php:188
+msgid "Settings updated successfully"
+msgstr "Mise à jour réussie des paramètres"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:73
+msgid "SMS Number"
+msgstr "Numéro de SMS"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:250
+#: app/Services/Integrations/Twilio/Bootstrap.php:271
+msgid "SMS Sent Successfully"
+msgstr "SMS envoyé avec succès"
+
+#: app/Services/Integrations/Calendars/Google/GoogleHelper.php:148
+msgid ""
+"Sorry! There has an error when fetching data for google authentication. "
+"Please try again"
+msgstr ""
+"Désolé ! Une erreur s'est produite lors de la récupération des données pour "
+"l'authentification Google. Veuillez réessayer"
+
+#: app/Services/Integrations/Calendars/Outlook/OutlookHelper.php:86
+msgid ""
+"Sorry! There has an error when fetching data for outlook authentication. "
+"Please try again"
+msgstr ""
+"Désolé, mais il y a une erreur lors de l'extraction des données pour "
+"l'authentification Outlook Une erreur s'est produite lors de l'extraction "
+"des données pour l'authentification Outlook. Veuillez réessayer"
+
+#: app/Modules/Coupon/CouponService.php:32
+msgid "Sorry, the coupon has reached the limit"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:31
+msgid "Sorry, the provided coupon does not meet the requirements"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:29
+msgid "Sorry, the provided coupon is expired"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:28
+msgid "Sorry, the provided coupon is not valid"
+msgstr ""
+
+#: app/Modules/Coupon/CouponService.php:30
+msgid "Sorry, you can not apply this coupon with other coupon code"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Google/GoogleCalendar.php:169
+#: app/Services/Integrations/Calendars/Outlook/OutlookCalendar.php:126
+msgid "start and end data is required"
+msgstr "les données de début et de fin sont requises"
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:161
+msgid "Start Meeting URL"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:74
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:75
+msgid "Status"
+msgstr "Statut"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:152
+msgid "Status:"
+msgstr "Statut :"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:22
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:566
+msgid "Stripe"
+msgstr "Stripe"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/API/ApiRequest.php:140
+msgid "Stripe General Error"
+msgstr "Erreur générale de Stripe"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/ConnectConfig.php:163
+msgid "Stripe mode is not active"
+msgstr "Le mode Stripe n'est pas actif"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:440
+msgid "Stripe Payments"
+msgstr "Paiements Stripe"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/ConnectConfig.php:200
+msgid "Stripe settings has been disconnected"
+msgstr "Les paramètres de Stripe ont été déconnectés"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:73
+msgid ""
+"Stripe's payments platform lets you accept credit cards, debit cards, and "
+"popular payment methods around the world—all with a single integration"
+msgstr ""
+"La plateforme de paiement Stripe vous permet d'accepter les cartes de crédit,"
+" les cartes de débit et les méthodes de paiement les plus courantes dans le "
+"monde entier, le tout grâce à une intégration unique"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:457
+msgid "Test Mode"
+msgstr "Mode test"
+
+#. Description of the plugin
+msgid "The Pro version of FluentBooking Plugin"
+msgstr ""
+
+#: app/Http/Controllers/CalendarController.php:78
+msgid "The provided slug is not available. Please choose a different one"
+msgstr "L'étiquette fournie n'est pas disponible. Veuillez en choisir un autre"
+
+#: app/Http/Controllers/CalendarController.php:20
+msgid "There should be at least one member"
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/Stripe/API/ApiRequest.php:128
+#: app/Services/Integrations/PaymentMethods/Stripe/API/ApiRequest.php:170
+msgid "There was a problem connecting to the Stripe API endpoint."
+msgstr ""
+"Il y a eu un problème de connexion au point de terminaison de l'API Stripe."
+
+#: app/Modules/Coupon/CouponService.php:123
+msgid ""
+"This coupon code has already been applied. Please use a different coupon."
+msgstr ""
+
+#: app/Modules/SingleEvent/SingleEventController.php:26
+msgid ""
+"This event has already been booked. You can not change the availability now"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:546
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:537
+msgid "This is a group event."
+msgstr ""
+
+#: app/Http/Controllers/TeamController.php:110
+msgid "This is an admin user. You can not change permissions"
+msgstr ""
+"Il s'agit d'un utilisateur administrateur. Vous ne pouvez pas modifier les "
+"autorisations"
+
+#: app/Services/Integrations/PaymentMethods/Paypal/Paypal.php:273
+#: app/Services/Integrations/PaymentMethods/Offline/Offline.php:197
+#: app/Services/Integrations/PaymentMethods/Stripe/Stripe.php:451
+msgid "This label will be displayed in the booking form"
+msgstr ""
+
+#. Instruction for connecting to Apple Server. %s is a link to manage Apple ID
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:112
+#, php-format
+msgid ""
+"To connect to Apple Server, please enter your Apple Email and app specific "
+"password. Generate App Specific Password at %s Your credentials will be "
+"stored as encrypted."
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:115
+msgid ""
+"To connect to Nextcloud Server, please enter your Nextcloud Email/Username "
+"and app specific password. Your credentials will be stored as encrypted."
+msgstr ""
+
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:70
+msgid ""
+"To use Apple Calendar Integration for your Booking forms, please enable the "
+"integration."
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:69
+msgid ""
+"To use Nextcloud Calendar Integration for your Booking forms, please enable "
+"the integration."
+msgstr ""
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:72
+msgid "Total Payment"
+msgstr "Paiement total"
+
+#: app/Services/Integrations/PaymentMethods/PaymentHelper.php:100
+msgid "Total:"
+msgstr "Total :"
+
+#: app/Services/Integrations/PaymentMethods/BasePaymentMethod.php:483
+#, php-format
+msgid "Transaction marked as paid and %s Transaction ID: %s "
+msgstr ""
+
+#: app/Http/Controllers/TransactionController.php:44
+msgid "Transaction updated successfully"
+msgstr ""
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:147
+msgid "Twilio API Error"
+msgstr "Erreur de l'API Twilio"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:97
+msgid "Twilio SMS Integration"
+msgstr "Intégration SMS Twilio"
+
+#: app/Services/Integrations/Calendars/Google/Client.php:270
+msgid "Unexpected error from google api"
+msgstr "Erreur inattendue de l'api google"
+
+#: app/Services/Integrations/Calendars/Outlook/Client.php:248
+msgid "Unexpected error from outlook api"
+msgstr "Erreur inattendue de l'api outlook"
+
+#: app/Services/Integrations/ZoomMeeting/Client.php:150
+#: app/Services/Integrations/Twilio/Client.php:68
+msgid "Unexpected error from remote api"
+msgstr "Erreur inattendue de l'api distante"
+
+#: app/Services/Integrations/PaymentMethods/Stripe/API/API.php:45
+msgid "Unknown Stripe API request error"
+msgstr "Erreur inconnue dans la requête API Stripe"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:154
+msgid "Update Caching Time"
+msgstr "Mise à jour de la durée de la mise en cache"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:152
+msgid "Use Outlook Calendar to sync your Fluent Booking events"
+msgstr ""
+"Utilisez le calendrier Outlook pour synchroniser vos événements Fluent "
+"Booking"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:74
+msgid "User redirected to Woo checkout page to comeplete the order."
+msgstr ""
+"L'utilisateur est redirigé vers la page de paiement de Woo pour finaliser la "
+"commande."
+
+#: app/Hooks/Handlers/UploadHandler.php:72
+msgid "Validation fails for maximum file size"
+msgstr ""
+
+#: app/Services/Integrations/Woo/Bootstrap.php:155
+msgid "View Full Meeting Details"
+msgstr "Voir tous les détails de la réunion"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:461
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:625
+msgid "View on Google Calendar"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:511
+msgid "View on Outlook Calendar"
+msgstr ""
+
+#: app/Services/Integrations/Woo/Bootstrap.php:345
+msgid "View Order"
+msgstr "Voir la commande"
+
+#: app/Services/Integrations/Calendars/Google/Bootstrap.php:864
+msgid "We could not authenticate your account. Please try again later."
+msgstr ""
+"Nous n'avons pas pu authentifier votre compte. Veuillez réessayer plus tard."
+
+#: app/Http/Controllers/WebhookController.php:119
+msgid "WebHook feeds not found"
+msgstr ""
+
+#: app/Http/Controllers/WebhookController.php:66
+msgid "WebHook not found"
+msgstr "WebHook introuvable"
+
+#: app/Services/Integrations/Webhook/WebhookIntegration.php:164
+msgid "Webhook sent successfully"
+msgstr "Webhook envoyé avec succès"
+
+#: app/Services/Integrations/Webhook/WebhookIntegration.php:155
+msgid "Webhook sent successfully to"
+msgstr "Webhook envoyé avec succès à"
+
+#: app/Http/Controllers/WebhookController.php:130
+msgid "WebHook Successfully Cloned"
+msgstr ""
+
+#: app/Http/Controllers/WebhookController.php:89
+msgid "WebHook Successfully Created"
+msgstr "WebHook créé avec succès"
+
+#: app/Http/Controllers/WebhookController.php:73
+msgid "WebHook Successfully Updated"
+msgstr "Mise à jour réussie du WebHook"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:78
+msgid "WhatsApp Number (Optional)"
+msgstr "Numéro WhatsApp (facultatif)"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:308
+msgid "Woo: Booking status changed to cancelled"
+msgstr ""
+"Woo : Le statut de la réservation a été modifié et est désormais annulé"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:426
+msgid "Woo: Booking status changed to scheduled"
+msgstr "Woo : Le statut de la réservation a été modifié pour devenir programmé"
+
+#: app/Services/Integrations/Woo/Bootstrap.php:221
+msgid "Woo: Booking status could not be changed"
+msgstr "Woo : Le statut de la réservation n'a pas pu être modifié"
+
+#: app/Http/Controllers/PaymentMethodController.php:197
+msgid "WooCommerce is not installed"
+msgstr "WooCommerce n'est pas installé"
+
+#. Notification message for the change of Woocommerce order status and booking status to cancelled. %1$s is the new order status, %2$s is a link to view the order
+#: app/Services/Integrations/Woo/Bootstrap.php:311
+#, php-format
+msgid ""
+"Woocommerce order status changed to %1$s and booking status changed to "
+"cancelled. %2$sView Order%3$s"
+msgstr ""
+
+#. Notification message for the change of Woocommerce order status and booking status to scheduled. %1$s is the new order status, %2$s is a link to view the order
+#: app/Services/Integrations/Woo/Bootstrap.php:429
+#, php-format
+msgid ""
+"Woocommerce order status changed to %1$s and booking status changed to "
+"scheduled. %2$sView Order%3$s"
+msgstr ""
+
+#. Author of the plugin
+msgid "WPManageNinja LLC"
+msgstr ""
+
+#: app/Services/Integrations/Woo/Bootstrap.php:67
+msgid "You are redirecting to checkout page to complete the appointment."
+msgstr ""
+"Vous êtes redirigé vers la page de paiement pour compléter le rendez-vous."
+
+#: app/Http/Controllers/ZoomController.php:214
+msgid "You do not have permission to access this user's Zoom credentials"
+msgstr ""
+"Vous n'avez pas le droit d'accéder aux identifiants Zoom de cet utilisateur"
+
+#: app/Hooks/Handlers/FrontendRenderer.php:92
+#: app/Hooks/Handlers/FrontendRenderer.php:123
+msgid "You do not have permission to view the bookings"
+msgstr ""
+
+#: app/Http/Controllers/IntegrationSettingsController.php:164
+msgid ""
+"Your credential could not be saved. Please make sure the credential is valid"
+msgstr ""
+
+#: app/Services/Integrations/Calendars/NextCloud/Bootstrap.php:690
+#: app/Services/Integrations/Calendars/AppleCalendar/Bootstrap.php:679
+msgid "Your credential has been saved"
+msgstr ""
+
+#: app/Http/Controllers/LicenseController.php:74
+msgid "Your license key has been successfully deactivated"
+msgstr "Votre clé de licence a été désactivée avec succès"
+
+#: app/Http/Controllers/LicenseController.php:54
+msgid "Your license key has been successfully updated"
+msgstr "Votre clé de licence a été mise à jour avec succès"
+
+#: app/Services/Integrations/Calendars/Outlook/Bootstrap.php:147
+msgid ""
+"Your outlook API configaration is already. You can connect your outlook "
+"calendar from your host settings."
+msgstr ""
+"Votre configuration de l'API Outlook est déjà en place. Vous pouvez "
+"connecter votre calendrier Outlook à partir des paramètres de votre hôte."
+
+#: app/Http/Controllers/IntegrationSettingsController.php:204
+msgid "Your selected integration feed has been disconnected"
+msgstr "Le flux d'intégration sélectionné a été déconnecté"
+
+#: app/Http/Controllers/IntegrationSettingsController.php:154
+msgid "Your selected remote calendar has been disconnected"
+msgstr "Le calendrier à distance sélectionné a été déconnecté"
+
+#: app/Http/Controllers/IntegrationSettingsController.php:115
+#: app/Http/Controllers/IntegrationSettingsController.php:129
+#: app/Http/Controllers/IntegrationSettingsController.php:141
+msgid "Your settings has been updated"
+msgstr "Vos paramètres ont été mis à jour"
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:103
+msgid "Your Twilio API integration is up and running."
+msgstr "Votre intégration à l'API Twilio est opérationnelle."
+
+#: app/Services/Integrations/Twilio/Bootstrap.php:104
+msgid "Your Twilio API Key is not valid."
+msgstr "Votre clé API Twilio n'est pas valide."
+
+#: app/Http/Controllers/ZoomController.php:120
+msgid "Zoom account email is empty"
+msgstr "L'email du compte Zoom est vide"
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:108
+msgid "Zoom Account ID"
+msgstr "ID du compte Zoom"
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:139
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:208
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:314
+msgid "Zoom API Error"
+msgstr "Erreur de l'API Zoom"
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:113
+msgid "Zoom App Client ID"
+msgstr "Zoom App Client ID"
+
+#: app/Services/Integrations/ZoomMeeting/ZoomHelper.php:118
+msgid "Zoom App Secret Key"
+msgstr "Clé secrète de l'application Zoom"
+
+#: app/Http/Controllers/ZoomController.php:80
+msgid "Zoom credentials already exist for this user"
+msgstr "Les identifiants Zoom existent déjà pour cet utilisateur"
+
+#: app/Http/Controllers/ZoomController.php:178
+msgid "Zoom credentials has been disconnected & deleted"
+msgstr "Zoom credentials a été déconnecté et supprimé"
+
+#: app/Http/Controllers/ZoomController.php:130
+msgid "Zoom credentials has been validated and saved securely"
+msgstr ""
+"Les informations d'identification de Zoom ont été validées et sauvegardées "
+"en toute sécurité"
+
+#: app/Http/Controllers/ZoomController.php:163
+msgid "Zoom credentials not found"
+msgstr "Les informations d'identification de Zoom ne sont pas trouvées"
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:159
+msgid "Zoom Meeting has been created"
+msgstr "La réunion Zoom a été créée"
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:218
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:219
+msgid "Zoom Meeting has been deleted"
+msgstr "Zoom Meeting a été supprimé"
+
+#. Notification message for the successful scheduling of a Zoom meeting. %1$s is a link to start the meeting
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:161
+#, php-format
+msgid "Zoom Meeting has been scheduled. %1$s"
+msgstr ""
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:330
+msgid "Zoom Meeting has been updated"
+msgstr "Zoom Meeting a été mis à jour"
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:331
+msgid "Zoom Meeting has been updated with the new data"
+msgstr "Zoom Meeting a été mis à jour avec les nouvelles données"
+
+#: app/Services/Integrations/ZoomMeeting/Bootstrap.php:71
+msgid "Zoom Video"
+msgstr "Zoom Vidéo"
