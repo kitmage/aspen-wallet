@@ -92,12 +92,7 @@ function aspen_wallet_render_admin_page() {
 							<td><?php echo esc_html( $row['description'] ); ?></td>
 							<td>
 								<a class="button button-secondary" href="<?php echo esc_url( add_query_arg( array( 'page' => 'aspen-wallet', 'edit_slug' => $row['slug'] ), admin_url( 'admin.php' ) ) ); ?>"><?php echo esc_html__( 'Edit', 'aspen-wallet' ); ?></a>
-								<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" style="display:inline-block;">
-									<input type="hidden" name="page" value="aspen-wallet" />
-									<input type="hidden" name="delete_slug" value="<?php echo esc_attr( $row['slug'] ); ?>" />
-									<button type="submit" class="button button-secondary"><?php echo esc_html__( 'Check usage', 'aspen-wallet' ); ?></button>
-								</form>
-								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
+									<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
 									<?php wp_nonce_field( 'aspen_wallet_delete_bucket' ); ?>
 									<input type="hidden" name="action" value="aspen_wallet_delete_bucket" />
 									<input type="hidden" name="slug" value="<?php echo esc_attr( $row['slug'] ); ?>" />
