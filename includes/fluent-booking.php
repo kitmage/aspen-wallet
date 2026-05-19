@@ -26,12 +26,28 @@ function aspen_wallet_fb_debug_log( $message, $context = array() ) {
 }
 
 function aspen_wallet_register_fluent_booking_hooks() {
-	if ( ! defined( 'FLUENT_BOOKING' ) ) {
-		aspen_wallet_fb_debug_log( 'Hook registration skipped because FLUENT_BOOKING is not defined.' );
+	$fluent_booking_loaded = defined( 'FLUENT_BOOKING' ) || defined( 'FLUENT_BOOKING_VERSION' ) || defined( 'FLUENT_BOOKING_LITE' ) || class_exists( '\\FluentBooking\\App\\App' );
+
+	if ( ! $fluent_booking_loaded ) {
+		aspen_wallet_fb_debug_log( 'Hook registration skipped because Fluent Booking was not detected.', array(
+			'FLUENT_BOOKING'         => defined( 'FLUENT_BOOKING' ),
+			'FLUENT_BOOKING_VERSION' => defined( 'FLUENT_BOOKING_VERSION' ),
+			'FLUENT_BOOKING_LITE'    => defined( 'FLUENT_BOOKING_LITE' ),
+			'app_class'              => class_exists( '\\FluentBooking\\App\\App' ),
+		) );
 		return;
 	}
 
-	aspen_wallet_fb_debug_log( 'Hook registration path reached.' );
+	aspen_wallet_fb_debug_log( 'Hook registration path reached.', array(
+		'FLUENT_BOOKING'         => defined( 'FLUENT_BOOKING' ),
+		'FLUENT_BOOKING_VERSION' => defined( 'FLUENT_BOOKING_VERSION' ),
+		'FLUENT_BOOKING_LITE'    => defined( 'FLUENT_BOOKING_LITE' ),
+		'app_class'              => class_exists( '\\FluentBooking\\App\\App' ),
+	) );
+
+	add_filter( 'fluent_booking/calendar_event_setting_menu_items', 'aspen_wallet_add_event_settings_menu_item', 20, 2 );
+	add_action( 'fluent_booking_after_event_settings_fields', 'aspen_wallet_render_fluent_booking_event_wallet_settings', 20, 1 );
+	add_action( 'fluent_booking_save_event_settings', 'aspen_wallet_save_fluent_booking_event_wallet_settings', 20, 2 );
 
 	add_filter( 'fluent_booking/event_payment_settings_defaults', 'aspen_wallet_add_payment_settings_defaults', 20, 2 );
 	add_filter( 'fluent_booking/get_event_payment_settings', 'aspen_wallet_add_payment_settings_fields', 20, 2 );
@@ -44,6 +60,33 @@ function aspen_wallet_register_fluent_booking_hooks() {
 
 	add_filter( 'fluent_booking_before_create_booking', 'aspen_wallet_validate_fluent_booking_before_create', 20, 3 );
 	add_action( 'fluent_booking_booking_created', 'aspen_wallet_debit_after_fluent_booking_created', 20, 2 );
+}
+
+
+function aspen_wallet_add_event_settings_menu_item( $items, $event ) {
+	if ( ! is_array( $items ) ) {
+		$items = array();
+	}
+
+	$calendar_id = is_object( $event ) && isset( $event->calendar_id ) ? (int) $event->calendar_id : 0;
+	$event_id    = is_object( $event ) && isset( $event->id ) ? (int) $event->id : 0;
+
+	$items['aspen_wallet'] = array(
+		'type'    => 'route',
+		'visible' => true,
+		'disable' => false,
+		'route'   => array(
+			'name'   => 'event_details',
+			'params' => array(
+				'calendar_id' => $calendar_id,
+				'event_id'    => $event_id,
+			),
+		),
+		'label'   => __( 'Aspen Wallet', 'aspen-wallet' ),
+		'elIcon'  => 'Wallet',
+	);
+
+	return $items;
 }
 
 function aspen_wallet_get_bucket_registry_slugs() {
@@ -181,6 +224,69 @@ function aspen_wallet_save_payment_settings_panel_checkbox( $settings ) {
 	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $normalized );
 
 	return $settings;
+}
+
+
+function aspen_wallet_render_fluent_booking_event_wallet_settings( $event ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$event_id  = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
+	$settings  = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+	$buckets   = aspen_wallet_get_buckets();
+	?>
+	<div class="aspen-wallet-event-settings">
+		<h3><?php esc_html_e( 'Wallet Restriction', 'aspen-wallet' ); ?></h3>
+		<p>
+			<label>
+				<input type="checkbox" name="aspen_wallet_enabled" value="1" <?php checked( $settings['enabled'] ); ?> />
+				<?php esc_html_e( 'Enable Aspen Credits for this event', 'aspen-wallet' ); ?>
+			</label>
+		</p>
+		<p>
+			<label for="aspen-wallet-credit-cost"><?php esc_html_e( 'Credit Cost (int)', 'aspen-wallet' ); ?></label>
+			<input id="aspen-wallet-credit-cost" type="number" min="0" step="1" name="aspen_wallet_credit_cost" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" />
+		</p>
+		<?php wp_nonce_field( 'aspen_wallet_save_fluent_booking_event_settings', 'aspen_wallet_fb_nonce' ); ?>
+		<p>
+			<label for="aspen-wallet-allowed-buckets"><?php esc_html_e( 'Allowed Buckets (ordered)', 'aspen-wallet' ); ?></label>
+			<select id="aspen-wallet-allowed-buckets" name="aspen_wallet_allowed_buckets[]" multiple="multiple">
+				<?php foreach ( $buckets as $bucket ) : ?>
+					<option value="<?php echo esc_attr( $bucket['slug'] ); ?>" <?php selected( in_array( $bucket['slug'], $settings['allowed_buckets'], true ) ); ?>><?php echo esc_html( $bucket['label'] ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</p>
+	</div>
+	<?php
+}
+
+function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $payload ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$event_id = (int) $event_id;
+	if ( $event_id <= 0 ) {
+		return;
+	}
+
+	$nonce = isset( $payload['aspen_wallet_fb_nonce'] ) ? sanitize_text_field( wp_unslash( $payload['aspen_wallet_fb_nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'aspen_wallet_save_fluent_booking_event_settings' ) ) {
+		return;
+	}
+
+	$enabled_input = isset( $payload['aspen_wallet_enabled'] ) ? $payload['aspen_wallet_enabled'] : 0;
+	$cost_input    = isset( $payload['aspen_wallet_credit_cost'] ) ? $payload['aspen_wallet_credit_cost'] : 0;
+	$buckets_input = isset( $payload['aspen_wallet_allowed_buckets'] ) ? $payload['aspen_wallet_allowed_buckets'] : array();
+
+	$enabled = ! empty( $enabled_input );
+	$cost    = aspen_wallet_to_int( $cost_input );
+	$buckets = aspen_wallet_sanitize_allowed_buckets( $buckets_input );
+
+	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $enabled ? 1 : 0 );
+	update_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, $cost );
+	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
 }
 
 function aspen_wallet_fluent_booking_affordability( $event_id, $user_id ) {
