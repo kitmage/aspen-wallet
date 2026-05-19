@@ -339,3 +339,104 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 		)
 	);
 }
+
+function aspen_wallet_get_fluent_booking_events_for_admin() {
+	global $wpdb;
+
+	$table = $wpdb->prefix . 'fluent_booking_calendar_slots';
+	$cal_table = $wpdb->prefix . 'fluent_booking_calendars';
+	$has_slots = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+	$has_cals  = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $cal_table ) );
+
+	if ( $table !== $has_slots ) {
+		return array();
+	}
+
+	if ( $cal_table === $has_cals ) {
+		$query = "SELECT s.id, s.title, s.calendar_id, c.title AS calendar_title FROM {$table} s LEFT JOIN {$cal_table} c ON c.id = s.calendar_id ORDER BY s.id DESC LIMIT 500";
+	} else {
+		$query = "SELECT id, title, calendar_id FROM {$table} ORDER BY id DESC LIMIT 500";
+	}
+
+	$rows = $wpdb->get_results( $query, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	return is_array( $rows ) ? $rows : array();
+}
+
+function aspen_wallet_render_booking_event_rules_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to access this page.', 'aspen-wallet' ) );
+	}
+
+	$events  = aspen_wallet_get_fluent_booking_events_for_admin();
+	$buckets = aspen_wallet_get_buckets();
+	$errors  = aspen_wallet_parse_notice_messages( isset( $_GET['wallet_errors'] ) ? wp_unslash( $_GET['wallet_errors'] ) : '' );
+	$success = aspen_wallet_parse_notice_messages( isset( $_GET['wallet_success'] ) ? wp_unslash( $_GET['wallet_success'] ) : '' );
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'Booking Event Rules', 'aspen-wallet' ); ?></h1>
+		<p class="description"><?php esc_html_e( 'Associate each Fluent Booking event with Aspen wallet credit rules.', 'aspen-wallet' ); ?></p>
+		<?php foreach ( $errors as $error ) : ?><div class="notice notice-error"><p><?php echo esc_html( $error ); ?></p></div><?php endforeach; ?>
+		<?php foreach ( $success as $message ) : ?><div class="notice notice-success"><p><?php echo esc_html( $message ); ?></p></div><?php endforeach; ?>
+
+		<?php if ( empty( $events ) ) : ?>
+			<p><?php esc_html_e( 'No Fluent Booking events were found. Confirm Fluent Booking is active and events exist.', 'aspen-wallet' ); ?></p>
+		<?php else : ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<?php wp_nonce_field( 'aspen_wallet_save_booking_event_rules' ); ?>
+			<input type="hidden" name="action" value="aspen_wallet_save_booking_event_rules" />
+			<table class="widefat striped">
+				<thead><tr><th><?php esc_html_e( 'Event', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Enable Credits', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Credit Cost', 'aspen-wallet' ); ?></th><th><?php esc_html_e( 'Allowed Buckets (comma-separated slugs)', 'aspen-wallet' ); ?></th></tr></thead>
+				<tbody>
+				<?php foreach ( $events as $event ) :
+					$event_id = isset( $event['id'] ) ? (int) $event['id'] : 0;
+					$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+					$calendar_id = isset( $event['calendar_id'] ) ? (int) $event['calendar_id'] : 0;
+					$link = admin_url( 'admin.php?page=fluent-booking#/calendars/' . $calendar_id . '/slot-settings/' . $event_id . '/event-details' );
+				?>
+				<tr>
+					<td>
+						<strong><?php echo esc_html( isset( $event['title'] ) ? $event['title'] : '' ); ?></strong>
+						<div><code><?php echo esc_html( sprintf( 'Event #%d / Calendar #%d', $event_id, $calendar_id ) ); ?></code></div>
+						<div><a href="<?php echo esc_url( $link ); ?>" target="_blank"><?php esc_html_e( 'Open in Fluent Booking', 'aspen-wallet' ); ?></a></div>
+					</td>
+					<td><label><input type="checkbox" name="rules[<?php echo esc_attr( $event_id ); ?>][enabled]" value="1" <?php checked( $settings['enabled'] ); ?> /> <?php esc_html_e( 'Enabled', 'aspen-wallet' ); ?></label></td>
+					<td><input type="number" min="0" step="1" name="rules[<?php echo esc_attr( $event_id ); ?>][credit_cost]" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" /></td>
+					<td><input type="text" class="regular-text" name="rules[<?php echo esc_attr( $event_id ); ?>][allowed_buckets]" value="<?php echo esc_attr( implode( ',', $settings['allowed_buckets'] ) ); ?>" placeholder="therapy,assessment" /></td>
+				</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+			<?php submit_button( __( 'Save Booking Event Rules', 'aspen-wallet' ) ); ?>
+			<p class="description"><?php echo esc_html( sprintf( __( 'Available bucket slugs: %s', 'aspen-wallet' ), implode( ', ', array_map( static function( $bucket ) { return $bucket['slug']; }, $buckets ) ) ) ); ?></p>
+		</form>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+function aspen_wallet_handle_save_booking_event_rules() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to save booking event rules.', 'aspen-wallet' ) );
+	}
+
+	check_admin_referer( 'aspen_wallet_save_booking_event_rules' );
+
+	$rules = isset( $_POST['rules'] ) && is_array( $_POST['rules'] ) ? wp_unslash( $_POST['rules'] ) : array();
+	foreach ( $rules as $event_id => $rule ) {
+		$event_id = (int) $event_id;
+		if ( $event_id <= 0 || ! is_array( $rule ) ) {
+			continue;
+		}
+
+		$enabled = ! empty( $rule['enabled'] ) ? 1 : 0;
+		$cost    = aspen_wallet_to_int( isset( $rule['credit_cost'] ) ? $rule['credit_cost'] : 0 );
+		$buckets = aspen_wallet_sanitize_allowed_buckets( isset( $rule['allowed_buckets'] ) ? $rule['allowed_buckets'] : '' );
+
+		update_post_meta( $event_id, ASPEN_WALLET_FB_META_ENABLED, $enabled );
+		update_post_meta( $event_id, ASPEN_WALLET_FB_META_COST, $cost );
+		update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
+	}
+
+	wp_safe_redirect( add_query_arg( array( 'page' => 'aspen-wallet-booking-rules', 'wallet_success' => rawurlencode( __( 'Booking event rules updated.', 'aspen-wallet' ) ) ), admin_url( 'admin.php' ) ) );
+	exit;
+}
