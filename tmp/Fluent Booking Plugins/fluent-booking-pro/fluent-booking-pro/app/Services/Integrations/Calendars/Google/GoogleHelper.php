@@ -23,8 +23,8 @@ class GoogleHelper
 
         if (!$settings) {
             return [
-                'client_id'        => '530691696829-0g22sbe8qnqtoh58v1rkc34efhrlld5c.apps.googleusercontent.com',
-                'client_secret'    => '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',
+                'client_id'        => '...',
+                'client_secret'    => '...',
                 'driver_type'      => 'system_defined',
                 'constant_defined' => true,
                 'caching_time'     => '5'
@@ -33,8 +33,8 @@ class GoogleHelper
 
         if (empty($settings['client_id']) || empty($settings['client_secret']) || Arr::get($settings, 'driver_type') == 'system_defined') {
             return [
-                'client_id'        => '530691696829-0g22sbe8qnqtoh58v1rkc34efhrlld5c.apps.googleusercontent.com',
-                'client_secret'    => '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',
+                'client_id'        => '...',
+                'client_secret'    => '...',
                 'driver_type'      => 'system_defined',
                 'constant_defined' => true,
                 'caching_time'     => Arr::get($settings, 'caching_time', 5)
