@@ -45,6 +45,7 @@ function aspen_wallet_register_fluent_booking_hooks() {
 		'app_class'              => class_exists( '\\FluentBooking\\App\\App' ),
 	) );
 
+	add_filter( 'fluent_booking/calendar_event_setting_menu_items', 'aspen_wallet_add_event_settings_menu_item', 20, 2 );
 	add_action( 'fluent_booking_after_event_settings_fields', 'aspen_wallet_render_fluent_booking_event_wallet_settings', 20, 1 );
 	add_action( 'fluent_booking_save_event_settings', 'aspen_wallet_save_fluent_booking_event_wallet_settings', 20, 2 );
 
@@ -59,6 +60,33 @@ function aspen_wallet_register_fluent_booking_hooks() {
 
 	add_filter( 'fluent_booking_before_create_booking', 'aspen_wallet_validate_fluent_booking_before_create', 20, 3 );
 	add_action( 'fluent_booking_booking_created', 'aspen_wallet_debit_after_fluent_booking_created', 20, 2 );
+}
+
+
+function aspen_wallet_add_event_settings_menu_item( $items, $event ) {
+	if ( ! is_array( $items ) ) {
+		$items = array();
+	}
+
+	$calendar_id = is_object( $event ) && isset( $event->calendar_id ) ? (int) $event->calendar_id : 0;
+	$event_id    = is_object( $event ) && isset( $event->id ) ? (int) $event->id : 0;
+
+	$items['aspen_wallet'] = array(
+		'type'    => 'route',
+		'visible' => true,
+		'disable' => false,
+		'route'   => array(
+			'name'   => 'event_details',
+			'params' => array(
+				'calendar_id' => $calendar_id,
+				'event_id'    => $event_id,
+			),
+		),
+		'label'   => __( 'Aspen Wallet', 'aspen-wallet' ),
+		'elIcon'  => 'Wallet',
+	);
+
+	return $items;
 }
 
 function aspen_wallet_get_bucket_registry_slugs() {
