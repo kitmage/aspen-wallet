@@ -343,16 +343,36 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 function aspen_wallet_get_fluent_booking_events_for_admin() {
 	global $wpdb;
 
-	$table = $wpdb->prefix . 'fluent_booking_calendar_slots';
-	$cal_table = $wpdb->prefix . 'fluent_booking_calendars';
-	$has_slots = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
-	$has_cals  = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $cal_table ) );
+	$slot_tables = array(
+		$wpdb->prefix . 'fcal_calendar_events',
+		$wpdb->prefix . 'fluent_booking_calendar_slots',
+	);
+	$cal_tables = array(
+		$wpdb->prefix . 'fcal_calendars',
+		$wpdb->prefix . 'fluent_booking_calendars',
+	);
 
-	if ( $table !== $has_slots ) {
+	$table = '';
+	foreach ( $slot_tables as $slot_table ) {
+		if ( $slot_table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $slot_table ) ) ) {
+			$table = $slot_table;
+			break;
+		}
+	}
+
+	$cal_table = '';
+	foreach ( $cal_tables as $candidate_cal_table ) {
+		if ( $candidate_cal_table === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $candidate_cal_table ) ) ) {
+			$cal_table = $candidate_cal_table;
+			break;
+		}
+	}
+
+	if ( '' === $table ) {
 		return array();
 	}
 
-	if ( $cal_table === $has_cals ) {
+	if ( '' !== $cal_table ) {
 		$query = "SELECT s.id, s.title, s.calendar_id, c.title AS calendar_title FROM {$table} s LEFT JOIN {$cal_table} c ON c.id = s.calendar_id ORDER BY s.id DESC LIMIT 500";
 	} else {
 		$query = "SELECT id, title, calendar_id FROM {$table} ORDER BY id DESC LIMIT 500";
@@ -401,7 +421,7 @@ function aspen_wallet_render_booking_event_rules_page() {
 					</td>
 					<td><label><input type="checkbox" name="rules[<?php echo esc_attr( $event_id ); ?>][enabled]" value="1" <?php checked( $settings['enabled'] ); ?> /> <?php esc_html_e( 'Enabled', 'aspen-wallet' ); ?></label></td>
 					<td><input type="number" min="0" step="1" name="rules[<?php echo esc_attr( $event_id ); ?>][credit_cost]" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" /></td>
-					<td><input type="text" class="regular-text" name="rules[<?php echo esc_attr( $event_id ); ?>][allowed_buckets]" value="<?php echo esc_attr( implode( ',', $settings['allowed_buckets'] ) ); ?>" placeholder="therapy,assessment" /></td>
+					<td><input type="text" class="regular-text" name="rules[<?php echo esc_attr( $event_id ); ?>][allowed_buckets]" value="<?php echo esc_attr( implode( ',', $settings['allowed_buckets'] ) ); ?>" placeholder="nexus-consulting-prepaid,nexus-consulting-subscription" /></td>
 				</tr>
 				<?php endforeach; ?>
 				</tbody>
