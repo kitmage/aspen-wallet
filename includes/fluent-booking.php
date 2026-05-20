@@ -421,7 +421,7 @@ function aspen_wallet_render_booking_event_rules_page() {
 					</td>
 					<td><label><input type="checkbox" name="rules[<?php echo esc_attr( $event_id ); ?>][enabled]" value="1" <?php checked( $settings['enabled'] ); ?> /> <?php esc_html_e( 'Enabled', 'aspen-wallet' ); ?></label></td>
 					<td><input type="number" min="0" step="1" name="rules[<?php echo esc_attr( $event_id ); ?>][credit_cost]" value="<?php echo esc_attr( $settings['credit_cost'] ); ?>" /></td>
-					<td><input type="text" class="regular-text" name="rules[<?php echo esc_attr( $event_id ); ?>][allowed_buckets]" value="<?php echo esc_attr( implode( ',', $settings['allowed_buckets'] ) ); ?>" placeholder="therapy,assessment" /></td>
+					<td><input type="text" class="regular-text" name="rules[<?php echo esc_attr( $event_id ); ?>][allowed_buckets]" value="<?php echo esc_attr( implode( ',', $settings['allowed_buckets'] ) ); ?>" placeholder="nexus-consulting-prepaid,nexus-consulting-subscription" /></td>
 				</tr>
 				<?php endforeach; ?>
 				</tbody>
