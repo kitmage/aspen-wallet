@@ -62,8 +62,14 @@ function aspen_wallet_register_fluent_booking_hooks() {
 	add_filter( 'fluent_booking_event_calendar_html', 'aspen_wallet_filter_fluent_booking_calendar_html', 20, 3 );
 	add_filter( 'aspen_wallet_booking_shortcode_output', 'aspen_wallet_maybe_block_booking_shortcode_output', 20, 4 );
 
-	add_filter( 'fluent_booking_before_create_booking', 'aspen_wallet_validate_fluent_booking_before_create', 20, 3 );
-	add_action( 'fluent_booking_booking_created', 'aspen_wallet_debit_after_fluent_booking_created', 20, 2 );
+	add_filter( 'fluent_booking/booking_data', 'aspen_wallet_validate_fluent_booking_booking_data', 20, 4 );
+	add_action( 'fluent_booking/after_booking_scheduled', 'aspen_wallet_debit_after_fluent_booking_created', 20, 3 );
+	add_action( 'fluent_booking/after_booking_pending', 'aspen_wallet_debit_after_fluent_booking_created', 20, 3 );
+
+	aspen_wallet_fb_debug_log( 'Registered Fluent Booking wallet hooks.', array(
+		'validation_hook' => 'fluent_booking/booking_data',
+		'debit_hooks'     => array( 'fluent_booking/after_booking_scheduled', 'fluent_booking/after_booking_pending' ),
+	) );
 }
 
 
@@ -404,20 +410,28 @@ function aspen_wallet_maybe_block_booking_shortcode_output( $output, $event_id, 
 	return do_shortcode( $fallback );
 }
 
-function aspen_wallet_validate_fluent_booking_before_create( $validation, $event, $booking_data ) {
-	$event_id = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
-	$user_id  = isset( $booking_data['user_id'] ) ? (int) $booking_data['user_id'] : get_current_user_id();
+function aspen_wallet_validate_fluent_booking_booking_data( $booking_data, $calendar_slot, $custom_fields_data, $raw_data ) {
+	$event_id = is_object( $calendar_slot ) && isset( $calendar_slot->id ) ? (int) $calendar_slot->id : aspen_wallet_fb_extract_int_field( $booking_data, array( 'event_id' ) );
+	$user_id  = aspen_wallet_fb_extract_int_field( $booking_data, array( 'person_user_id', 'user_id', 'wp_user_id' ) );
+
+	if ( $user_id <= 0 && is_array( $booking_data ) && ! empty( $booking_data['email'] ) ) {
+		$matched_user = get_user_by( 'email', sanitize_email( (string) $booking_data['email'] ) );
+		if ( $matched_user instanceof WP_User ) {
+			$user_id = (int) $matched_user->ID;
+		}
+	}
 
 	$check = aspen_wallet_fluent_booking_affordability( $event_id, $user_id );
-	aspen_wallet_fb_debug_log( 'Pre-booking wallet validation result.', array(
-		'event_id' => $event_id,
-		'user_id'  => $user_id,
-		'allowed'  => ! empty( $check['allowed'] ),
-		'reason'   => isset( $check['reason'] ) ? $check['reason'] : '',
-		'booking_data' => is_array( $booking_data ) ? $booking_data : array(),
+	aspen_wallet_fb_debug_log( 'Booking-data wallet validation result.', array(
+		'event_id'      => $event_id,
+		'user_id'       => $user_id,
+		'allowed'       => ! empty( $check['allowed'] ),
+		'reason'        => isset( $check['reason'] ) ? $check['reason'] : '',
+		'booking_data'  => is_array( $booking_data ) ? $booking_data : array(),
+		'raw_data'      => is_array( $raw_data ) ? $raw_data : array(),
 	) );
 	if ( $check['allowed'] ) {
-		return $validation;
+		return $booking_data;
 	}
 
 	return new WP_Error( 'wallet_insufficient_credits', $check['reason'] );
