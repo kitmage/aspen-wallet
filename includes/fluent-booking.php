@@ -262,6 +262,65 @@ function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $pay
 	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
 }
 
+
+function aspen_wallet_fb_extract_int_field( $value, $keys ) {
+	if ( ! is_array( $keys ) || empty( $keys ) ) {
+		return 0;
+	}
+
+	foreach ( $keys as $key ) {
+		if ( is_object( $value ) && isset( $value->{$key} ) ) {
+			return (int) $value->{$key};
+		}
+
+		if ( is_array( $value ) && isset( $value[ $key ] ) ) {
+			return (int) $value[ $key ];
+		}
+	}
+
+	return 0;
+}
+
+function aspen_wallet_fb_resolve_booking_event_id( $booking, $event ) {
+	$event_id = aspen_wallet_fb_extract_int_field( $event, array( 'id', 'event_id', 'slot_id', 'calendar_slot_id' ) );
+	if ( $event_id > 0 ) {
+		return $event_id;
+	}
+
+	return aspen_wallet_fb_extract_int_field( $booking, array( 'event_id', 'slot_id', 'calendar_slot_id' ) );
+}
+
+function aspen_wallet_fb_resolve_booking_user_id( $booking ) {
+	$user_id = aspen_wallet_fb_extract_int_field( $booking, array( 'user_id', 'wp_user_id', 'attendee_user_id', 'booked_by_user_id' ) );
+	if ( $user_id > 0 ) {
+		return $user_id;
+	}
+
+	$user = aspen_wallet_fb_extract_int_field( $booking, array( 'person_id', 'attendee_id', 'customer_id', 'contact_id' ) );
+	if ( $user > 0 ) {
+		$candidate = (int) get_user_meta( $user, '_fluent_booking_wp_user_id', true );
+		if ( $candidate > 0 ) {
+			return $candidate;
+		}
+	}
+
+	$email = '';
+	if ( is_object( $booking ) && isset( $booking->email ) ) {
+		$email = sanitize_email( (string) $booking->email );
+	} elseif ( is_array( $booking ) && isset( $booking['email'] ) ) {
+		$email = sanitize_email( (string) $booking['email'] );
+	}
+
+	if ( '' !== $email ) {
+		$matched_user = get_user_by( 'email', $email );
+		if ( $matched_user instanceof WP_User ) {
+			return (int) $matched_user->ID;
+		}
+	}
+
+	return 0;
+}
+
 function aspen_wallet_fluent_booking_affordability( $event_id, $user_id ) {
 	$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
 	$user_id  = (int) $user_id;
@@ -316,11 +375,17 @@ function aspen_wallet_validate_fluent_booking_before_create( $validation, $event
 }
 
 function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
-	$event_id = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
-	$user_id  = is_object( $booking ) && isset( $booking->user_id ) ? (int) $booking->user_id : 0;
+	$event_id = aspen_wallet_fb_resolve_booking_event_id( $booking, $event );
+	$user_id  = aspen_wallet_fb_resolve_booking_user_id( $booking );
 
 	$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
 	if ( ! $settings['enabled'] || $user_id <= 0 ) {
+		aspen_wallet_fb_debug_log( 'Skipping wallet debit after booking create.', array(
+			'event_id'        => $event_id,
+			'user_id'         => $user_id,
+			'wallet_enabled'  => ! empty( $settings['enabled'] ),
+			'booking_payload' => is_object( $booking ) ? get_object_vars( $booking ) : ( is_array( $booking ) ? $booking : array() ),
+		) );
 		return;
 	}
 
