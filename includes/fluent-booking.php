@@ -262,6 +262,90 @@ function aspen_wallet_save_fluent_booking_event_wallet_settings( $event_id, $pay
 	update_post_meta( $event_id, ASPEN_WALLET_FB_META_ALLOWED_BUCKETS, $buckets );
 }
 
+
+function aspen_wallet_fb_extract_int_field( $value, $keys ) {
+	if ( ! is_array( $keys ) || empty( $keys ) ) {
+		return 0;
+	}
+
+	foreach ( $keys as $key ) {
+		if ( is_object( $value ) && isset( $value->{$key} ) ) {
+			return (int) $value->{$key};
+		}
+
+		if ( is_array( $value ) && isset( $value[ $key ] ) ) {
+			return (int) $value[ $key ];
+		}
+	}
+
+	return 0;
+}
+
+
+function aspen_wallet_fb_get_booking_payload( $booking ) {
+	if ( is_object( $booking ) || is_array( $booking ) ) {
+		return $booking;
+	}
+
+	$booking_id = (int) $booking;
+	if ( $booking_id <= 0 ) {
+		return array();
+	}
+
+	global $wpdb;
+
+	$tables = array(
+		$wpdb->prefix . 'fcal_bookings',
+		$wpdb->prefix . 'fluent_booking_bookings',
+	);
+
+	foreach ( $tables as $table ) {
+		if ( $table !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) ) {
+			continue;
+		}
+
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d LIMIT 1", $booking_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		if ( is_array( $row ) ) {
+			return $row;
+		}
+	}
+
+	return array();
+}
+
+function aspen_wallet_fb_resolve_booking_event_id( $booking, $event ) {
+	$payload = aspen_wallet_fb_get_booking_payload( $booking );
+	$event_id = aspen_wallet_fb_extract_int_field( $event, array( 'id', 'event_id', 'slot_id', 'calendar_slot_id' ) );
+	if ( $event_id > 0 ) {
+		return $event_id;
+	}
+
+	return aspen_wallet_fb_extract_int_field( $payload, array( 'event_id', 'slot_id', 'calendar_slot_id', 'calendar_event_id' ) );
+}
+
+function aspen_wallet_fb_resolve_booking_user_id( $booking ) {
+	$payload = aspen_wallet_fb_get_booking_payload( $booking );
+	$user_id = aspen_wallet_fb_extract_int_field( $payload, array( 'user_id', 'wp_user_id', 'attendee_user_id', 'booked_by_user_id' ) );
+	if ( $user_id > 0 ) {
+		return $user_id;
+	}
+	$email = '';
+	if ( is_object( $payload ) && isset( $payload->email ) ) {
+		$email = sanitize_email( (string) $payload->email );
+	} elseif ( is_array( $payload ) && isset( $payload['email'] ) ) {
+		$email = sanitize_email( (string) $payload['email'] );
+	}
+
+	if ( '' !== $email ) {
+		$matched_user = get_user_by( 'email', $email );
+		if ( $matched_user instanceof WP_User ) {
+			return (int) $matched_user->ID;
+		}
+	}
+
+	return 0;
+}
+
 function aspen_wallet_fluent_booking_affordability( $event_id, $user_id ) {
 	$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
 	$user_id  = (int) $user_id;
@@ -316,11 +400,18 @@ function aspen_wallet_validate_fluent_booking_before_create( $validation, $event
 }
 
 function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
-	$event_id = is_object( $event ) && isset( $event->id ) ? (int) $event->id : (int) $event;
-	$user_id  = is_object( $booking ) && isset( $booking->user_id ) ? (int) $booking->user_id : 0;
+	$event_id = aspen_wallet_fb_resolve_booking_event_id( $booking, $event );
+	$user_id  = aspen_wallet_fb_resolve_booking_user_id( $booking );
 
+	$payload  = aspen_wallet_fb_get_booking_payload( $booking );
 	$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
 	if ( ! $settings['enabled'] || $user_id <= 0 ) {
+		aspen_wallet_fb_debug_log( 'Skipping wallet debit after booking create.', array(
+			'event_id'        => $event_id,
+			'user_id'         => $user_id,
+			'wallet_enabled'  => ! empty( $settings['enabled'] ),
+			'booking_payload' => is_object( $payload ) ? get_object_vars( $payload ) : ( is_array( $payload ) ? $payload : array() ),
+		) );
 		return;
 	}
 
@@ -332,7 +423,7 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 	do_action(
 		'aspen_wallet_booking_debit_failed',
 		array(
-			'booking_id' => is_object( $booking ) && isset( $booking->id ) ? (int) $booking->id : 0,
+			'booking_id' => aspen_wallet_fb_extract_int_field( $payload, array( 'id' ) ),
 			'event_id'   => $event_id,
 			'user_id'    => $user_id,
 			'reason'     => __( 'Wallet debit failed after booking creation.', 'aspen-wallet' ),
