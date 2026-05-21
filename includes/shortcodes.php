@@ -76,11 +76,7 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 		'wallet_if'
 	);
 
-	$bucket = aspen_wallet_sanitize_bucket_slug( $atts['bucket'] );
-	if ( '' === $bucket || ! aspen_wallet_get_bucket_by_slug( $bucket ) ) {
-		$fallback = aspen_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
-		return '' !== $fallback ? do_shortcode( $fallback ) : '';
-	}
+	$user_id = get_current_user_id();
 
 	$has_rule   = false;
 	$conditions = array();
@@ -100,23 +96,52 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 		$has_rule             = true;
 	}
 
+	$bucket_input = isset( $atts['bucket'] ) ? wp_unslash( (string) $atts['bucket'] ) : '';
+	$bucket_input = sanitize_text_field( $bucket_input );
+	$bucket_input = trim( $bucket_input );
+
+	if ( '' === $bucket_input ) {
+		$balance = 0;
+		foreach ( aspen_wallet_get_buckets() as $bucket ) {
+			if ( empty( $bucket['slug'] ) ) {
+				continue;
+			}
+			$balance += wallet_get_balance( $user_id, $bucket['slug'] );
+		}
+	} else {
+		$raw_buckets = explode( ',', $bucket_input );
+		$buckets     = aspen_wallet_normalize_bucket_list( $raw_buckets );
+
+		if ( empty( $buckets ) ) {
+			$fallback = aspen_wallet_sanitize_shortcode_fallback( $atts['fallback'] );
+			return '' !== $fallback ? do_shortcode( $fallback ) : '';
+		}
+
+		$balance = 0;
+		foreach ( $buckets as $bucket ) {
+			if ( ! aspen_wallet_get_bucket_by_slug( $bucket ) ) {
+				continue;
+			}
+			$balance += wallet_get_balance( $user_id, $bucket );
+		}
+	}
+
 	if ( ! $has_rule ) {
-		return '';
-	}
+		$match = $balance > 0;
+	} else {
+		$match = true;
 
-	$balance = wallet_get_balance( get_current_user_id(), $bucket );
-	$match   = true;
+		if ( isset( $conditions['min'] ) && $balance < $conditions['min'] ) {
+			$match = false;
+		}
 
-	if ( isset( $conditions['min'] ) && $balance < $conditions['min'] ) {
-		$match = false;
-	}
+		if ( isset( $conditions['max'] ) && $balance > $conditions['max'] ) {
+			$match = false;
+		}
 
-	if ( isset( $conditions['max'] ) && $balance > $conditions['max'] ) {
-		$match = false;
-	}
-
-	if ( isset( $conditions['equals'] ) && $balance !== $conditions['equals'] ) {
-		$match = false;
+		if ( isset( $conditions['equals'] ) && $balance !== $conditions['equals'] ) {
+			$match = false;
+		}
 	}
 
 	if ( $match ) {
