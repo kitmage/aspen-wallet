@@ -53,12 +53,18 @@ Balance API contracts:
 - `wallet_set_balance( $user_id, $bucket, $amount ) -> bool`: writes parsed int (invalid parses become `0`). Emits `wallet_balance_updated` only when write succeeds and value changed.
 - `wallet_add_balance( $user_id, $bucket, $amount ) -> bool`: no-op success for non-positive amounts; otherwise read + set.
 - `wallet_can_afford( $user_id, $buckets, $amount ) -> bool`: checks cumulative balance over normalized bucket priority order.
+- `aspen_wallet_get_effective_wallet_user_id( $user_id ) -> int`: resolves the actual wallet owner for front-end wallet usage; with Teams for WooCommerce Memberships active, team members resolve to the selected team's owner, and users without a team resolve to themselves.
 - `wallet_debit_balances( $user_id, $buckets, $amount ) -> array` with keys:
   - `success`
   - `requested_amount`
   - `debited_amount`
   - `remaining_amount`
   - `deltas` (bucket => negative delta)
+
+Teams for WooCommerce Memberships compatibility:
+- `aspen_wallet_get_user_teams()` uses `wc_memberships_for_teams_get_teams()` when available and requests `owner`, `manager`, and `member` roles.
+- Team owner resolution prefers team object getter methods, then falls back to the team post `post_author`.
+- Users in multiple teams use the first team with a resolvable owner by default. Customize via `aspen_wallet_effective_wallet_user_id`.
 
 `wallet_balance_updated` action semantics:
 - Fired from `wallet_set_balance()`.
@@ -146,25 +152,27 @@ Event settings UI + storage:
 
 Affordability checks + fallback behavior:
 - Central check: `aspen_wallet_fluent_booking_affordability()`.
+- Affordability resolves the booking user through `aspen_wallet_get_effective_wallet_user_id()` before checking balances, so team members spend from the team owner's wallet.
 - For calendar HTML (`fluent_booking_event_calendar_html`) and `[wallet_booking]`, blocked users see fallback shortcode/content (or reason message).
 
 Pre-create + post-create paths:
 - Pre-create validation filter `fluent_booking_before_create_booking` returns `WP_Error( 'wallet_insufficient_credits', ... )` when blocked.
-- Post-create action `fluent_booking_booking_created` debits via `wallet_debit_balances()`.
+- Post-create action `fluent_booking_booking_created` debits via `wallet_debit_balances()` against the effective wallet user ID.
 
 Failure action payload:
 - On debit failure, emits `aspen_wallet_booking_debit_failed` with:
   - `booking_id` (int)
   - `event_id` (int)
-  - `user_id` (int)
+  - `user_id` (int; booking user for backward compatibility)
+  - `wallet_user_id` (int; debited wallet owner)
   - `reason` (string)
 
 ## Shortcodes & Front-End Behavior (`includes/shortcodes.php`)
 Registered shortcodes (`aspen_wallet_register_shortcode_hooks()`):
 - `[wallet_balance bucket="" divide_by="1" decimals="0" suffix=""]`
-  - Reads current user bucket balance; returns escaped string (raw int or formatted).
+  - Reads the effective wallet user's bucket balance; returns escaped string (raw int or formatted).
 - `[wallet_if bucket="" min="" max="" equals="" fallback=""]...[/wallet_if]`
-  - Evaluates integer conditions on current user balance; renders enclosed content or fallback.
+  - Evaluates integer conditions on the effective wallet user's balance; renders enclosed content or fallback.
 - `[wallet_booking calendar_id="0" event_id="0" fallback=""]`
   - Runs wallet affordability check before rendering `[fluent_booking ...]`; filterable via `aspen_wallet_booking_shortcode_output`.
 
@@ -179,7 +187,7 @@ Restriction impact:
 | Action | Arguments | Source | Purpose |
 |---|---|---|---|
 | `wallet_balance_updated` | `$user_id, $bucket, $old, $new, 'set_balance'` | `wallet_set_balance()` | Notify on successful changed balance writes. |
-| `aspen_wallet_booking_debit_failed` | `array{booking_id,event_id,user_id,reason}` | `aspen_wallet_debit_after_fluent_booking_created()` | Emit when post-booking debit fails. |
+| `aspen_wallet_booking_debit_failed` | `array{booking_id,event_id,user_id,wallet_user_id,reason}` | `aspen_wallet_debit_after_fluent_booking_created()` | Emit when post-booking debit fails. |
 
 ### Filters consumed/applied
 | Filter | Arguments | Source | Purpose |
@@ -187,6 +195,7 @@ Restriction impact:
 | `fluent_booking_event_calendar_html` | `$html, $event, $context` | `aspen_wallet_filter_fluent_booking_calendar_html()` | Replace calendar output when user cannot afford booking. |
 | `fluent_booking_before_create_booking` | `$validation, $event, $booking_data` | `aspen_wallet_validate_fluent_booking_before_create()` | Block booking creation when credits insufficient. |
 | `aspen_wallet_booking_shortcode_output` | `$output, $event_id, $fallback, $user_id` | `aspen_wallet_shortcode_booking()` + `aspen_wallet_maybe_block_booking_shortcode_output()` | Post-process booking shortcode output and enforce wallet fallback. |
+| `aspen_wallet_effective_wallet_user_id` | `$wallet_user_id, $user_id, $selected_team, $teams` | `aspen_wallet_get_effective_wallet_user_id()` | Override which user wallet backs a logged-in user, especially for multi-team sites. |
 
 ## Operational Runbook
 - **Add a new bucket safely**

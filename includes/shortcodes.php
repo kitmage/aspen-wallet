@@ -43,8 +43,9 @@ function aspen_wallet_shortcode_balance( $atts ) {
 		return '';
 	}
 
-	$user_id = get_current_user_id();
-	$amount  = wallet_get_balance( $user_id, $bucket );
+	$user_id        = get_current_user_id();
+	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
+	$amount         = wallet_get_balance( $wallet_user_id, $bucket );
 
 	$divide_by = aspen_wallet_to_int( $atts['divide_by'] );
 	$decimals  = min( 6, aspen_wallet_to_int( $atts['decimals'] ) );
@@ -76,7 +77,8 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 		'wallet_if'
 	);
 
-	$user_id = get_current_user_id();
+	$user_id        = get_current_user_id();
+	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
 
 	$has_rule   = false;
 	$conditions = array();
@@ -106,7 +108,7 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 			if ( empty( $bucket['slug'] ) ) {
 				continue;
 			}
-			$balance += wallet_get_balance( $user_id, $bucket['slug'] );
+			$balance += wallet_get_balance( $wallet_user_id, $bucket['slug'] );
 		}
 	} else {
 		$raw_buckets = explode( ',', $bucket_input );
@@ -122,7 +124,7 @@ function aspen_wallet_shortcode_if( $atts, $content = '' ) {
 			if ( ! aspen_wallet_get_bucket_by_slug( $bucket ) ) {
 				continue;
 			}
-			$balance += wallet_get_balance( $user_id, $bucket );
+			$balance += wallet_get_balance( $wallet_user_id, $bucket );
 		}
 	}
 

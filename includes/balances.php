@@ -105,6 +105,187 @@ function aspen_wallet_normalize_bucket_list( $buckets ) {
 	return array_values( $normalized );
 }
 
+
+/**
+ * Get an integer property from a Teams for WooCommerce Memberships team object.
+ *
+ * @param mixed    $team    Team object or ID.
+ * @param string[] $methods Candidate getter methods.
+ * @return int
+ */
+function aspen_wallet_get_team_int_property( $team, $methods ) {
+	foreach ( $methods as $method ) {
+		if ( is_object( $team ) && is_callable( array( $team, $method ) ) ) {
+			$value = $team->{$method}();
+			$value = is_object( $value ) && isset( $value->ID ) ? $value->ID : $value;
+			$value = absint( $value );
+
+			if ( $value > 0 ) {
+				return $value;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Resolve a Teams for WooCommerce Memberships team ID from a team object.
+ *
+ * @param mixed $team Team object or ID.
+ * @return int
+ */
+function aspen_wallet_get_team_id( $team ) {
+	if ( is_numeric( $team ) ) {
+		return absint( $team );
+	}
+
+	$team_id = aspen_wallet_get_team_int_property(
+		$team,
+		array( 'get_id', 'get_team_id', 'get_post_id' )
+	);
+
+	if ( $team_id > 0 ) {
+		return $team_id;
+	}
+
+	if ( is_object( $team ) ) {
+		foreach ( array( 'id', 'ID', 'team_id', 'post_id' ) as $property ) {
+			if ( isset( $team->{$property} ) ) {
+				$team_id = absint( $team->{$property} );
+
+				if ( $team_id > 0 ) {
+					return $team_id;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Resolve the owning user ID for a Teams for WooCommerce Memberships team.
+ *
+ * @param mixed $team Team object or ID.
+ * @return int
+ */
+function aspen_wallet_get_team_owner_id( $team ) {
+	$owner_id = aspen_wallet_get_team_int_property(
+		$team,
+		array( 'get_owner_id', 'get_owner_user_id', 'get_user_id' )
+	);
+
+	if ( $owner_id > 0 ) {
+		return $owner_id;
+	}
+
+	$team_id = aspen_wallet_get_team_id( $team );
+	if ( $team_id <= 0 ) {
+		return 0;
+	}
+
+	return absint( get_post_field( 'post_author', $team_id ) );
+}
+
+/**
+ * Normalize Teams for WooCommerce Memberships query results to a plain team list.
+ *
+ * @param mixed $teams Raw Teams API result.
+ * @return array<int,mixed>
+ */
+function aspen_wallet_normalize_teams_result( $teams ) {
+	if ( empty( $teams ) ) {
+		return array();
+	}
+
+	if ( is_object( $teams ) && is_callable( array( $teams, 'get_teams' ) ) ) {
+		$teams = $teams->get_teams();
+	}
+
+	if ( is_object( $teams ) ) {
+		$teams = array( $teams );
+	}
+
+	if ( is_array( $teams ) && isset( $teams['teams'] ) && is_array( $teams['teams'] ) ) {
+		$teams = $teams['teams'];
+	}
+
+	if ( ! is_array( $teams ) ) {
+		return array();
+	}
+
+	return array_values( $teams );
+}
+
+/**
+ * Get Teams for WooCommerce Memberships teams associated with a user.
+ *
+ * @param int $user_id User ID.
+ * @return array<int,mixed>
+ */
+function aspen_wallet_get_user_teams( $user_id ) {
+	$user_id = absint( $user_id );
+
+	if ( $user_id <= 0 || ! function_exists( 'wc_memberships_for_teams_get_teams' ) ) {
+		return array();
+	}
+
+	$teams = wc_memberships_for_teams_get_teams(
+		$user_id,
+		array(
+			'role' => array( 'owner', 'manager', 'member' ),
+		)
+	);
+
+	return aspen_wallet_normalize_teams_result( $teams );
+}
+
+/**
+ * Resolve the wallet owner that should be used for a user.
+ *
+ * Team members use their Teams for WooCommerce Memberships team owner's wallet.
+ * Users without a team, team owners, and users on sites without Teams keep using
+ * their own wallet. If a user belongs to multiple teams, the first team with a
+ * resolvable owner is used by default and can be customized by filter.
+ *
+ * @param mixed $user_id User ID.
+ * @return int
+ */
+function aspen_wallet_get_effective_wallet_user_id( $user_id ) {
+	$user_id = absint( $user_id );
+
+	if ( $user_id <= 0 ) {
+		return 0;
+	}
+
+	$teams          = aspen_wallet_get_user_teams( $user_id );
+	$wallet_user_id = $user_id;
+	$selected_team  = null;
+
+	foreach ( $teams as $team ) {
+		$owner_id = aspen_wallet_get_team_owner_id( $team );
+
+		if ( $owner_id <= 0 ) {
+			continue;
+		}
+
+		$wallet_user_id = $owner_id;
+		$selected_team  = $team;
+		break;
+	}
+
+	/**
+	 * Filters the user ID whose wallet should be used for a given user.
+	 *
+	 * @param int        $wallet_user_id Resolved wallet owner user ID.
+	 * @param int        $user_id        Original user ID.
+	 * @param mixed|null $selected_team  Selected team object or ID.
+	 * @param array      $teams          All team objects returned for the user.
+	 */
+	return absint( apply_filters( 'aspen_wallet_effective_wallet_user_id', $wallet_user_id, $user_id, $selected_team, $teams ) );
+}
+
 /**
  * Get a bucket balance.
  *

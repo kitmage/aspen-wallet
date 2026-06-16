@@ -15,6 +15,7 @@ This plugin is for teams that want to:
 - **Grants credits from WooCommerce purchases**.
 - **Supports subscription reset grants** through WooCommerce Subscriptions.
 - **Checks and debits credits for Fluent Booking events**.
+- **Uses a team owner’s wallet for Teams for WooCommerce Memberships members**.
 - **Provides shortcodes** for balance displays and conditional content.
 
 ## Requirements
@@ -25,6 +26,7 @@ This plugin is for teams that want to:
   - WooCommerce
   - WooCommerce Subscriptions
   - Fluent Booking
+  - Teams for WooCommerce Memberships
 
 ## Installation
 
@@ -50,7 +52,8 @@ This plugin is for teams that want to:
 2. Aspen Wallet adds credits to the configured bucket(s).
 3. Customer visits a booking page.
 4. Aspen Wallet checks whether the customer can afford the configured event cost.
-5. If affordable, booking proceeds and credits are debited.
+   - If the customer is part of a Teams for WooCommerce Memberships team, the team owner's wallet is checked.
+5. If affordable, booking proceeds and credits are debited from the applicable wallet.
 6. If not affordable, the customer sees your fallback/restriction message.
 
 ## Admin features
@@ -73,6 +76,7 @@ This plugin is for teams that want to:
 
 - Aspen Wallet uses **integer credits** (no decimal balances).
 - Credits are bucket-specific and can be prioritized by allowed buckets in booking rules.
+- For Teams for WooCommerce Memberships users, front-end balance displays, booking affordability checks, and booking debits resolve to the team owner's wallet by default. If a user belongs to multiple teams, Aspen Wallet uses the first team returned by the Teams API unless customized with `aspen_wallet_effective_wallet_user_id`.
 - Some functionality is dependency-gated and only activates when related plugins are active.
 
 ## Support and implementation details
