@@ -380,12 +380,14 @@ function aspen_wallet_fluent_booking_affordability( $event_id, $user_id ) {
 		return array( 'allowed' => false, 'reason' => __( 'You must be logged in to book this event.', 'aspen-wallet' ) );
 	}
 
-	if ( ! wallet_can_afford( $user_id, $settings['allowed_buckets'], $settings['credit_cost'] ) ) {
-		aspen_wallet_fb_debug_log( 'Affordability check failed due to insufficient balance.', array( 'event_id' => $event_id, 'user_id' => $user_id, 'settings' => $settings ) );
+	$wallet_user_id = aspen_wallet_get_effective_wallet_user_id( $user_id );
+
+	if ( $wallet_user_id <= 0 || ! wallet_can_afford( $wallet_user_id, $settings['allowed_buckets'], $settings['credit_cost'] ) ) {
+		aspen_wallet_fb_debug_log( 'Affordability check failed due to insufficient balance.', array( 'event_id' => $event_id, 'booking_user_id' => $user_id, 'wallet_user_id' => $wallet_user_id, 'settings' => $settings ) );
 		return array( 'allowed' => false, 'reason' => __( 'Insufficient wallet credits for this booking.', 'aspen-wallet' ) );
 	}
 
-	return array( 'allowed' => true, 'reason' => '' );
+	return array( 'allowed' => true, 'reason' => '', 'wallet_user_id' => $wallet_user_id );
 }
 
 function aspen_wallet_filter_fluent_booking_calendar_html( $html, $event, $context ) {
@@ -441,12 +443,14 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 	$event_id = aspen_wallet_fb_resolve_booking_event_id( $booking, $event );
 	$user_id  = aspen_wallet_fb_resolve_booking_user_id( $booking );
 
-	$payload  = aspen_wallet_fb_get_booking_payload( $booking );
-	$settings = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
-	if ( ! $settings['enabled'] || $user_id <= 0 ) {
+	$payload        = aspen_wallet_fb_get_booking_payload( $booking );
+	$settings       = aspen_wallet_get_fluent_booking_event_wallet_settings( $event_id );
+	$wallet_user_id = $user_id > 0 ? aspen_wallet_get_effective_wallet_user_id( $user_id ) : 0;
+	if ( ! $settings['enabled'] || $user_id <= 0 || $wallet_user_id <= 0 ) {
 		aspen_wallet_fb_debug_log( 'Skipping wallet debit after booking create.', array(
 			'event_id'        => $event_id,
-			'user_id'         => $user_id,
+			'booking_user_id' => $user_id,
+			'wallet_user_id'  => $wallet_user_id,
 			'wallet_enabled'  => ! empty( $settings['enabled'] ),
 			'booking_payload' => is_object( $payload ) ? get_object_vars( $payload ) : ( is_array( $payload ) ? $payload : array() ),
 		) );
@@ -455,17 +459,19 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 
 	aspen_wallet_fb_debug_log( 'Attempting wallet debit after booking creation.', array(
 		'event_id'        => $event_id,
-		'user_id'         => $user_id,
+		'booking_user_id' => $user_id,
+		'wallet_user_id'  => $wallet_user_id,
 		'credit_cost'     => $settings['credit_cost'],
 		'allowed_buckets' => $settings['allowed_buckets'],
 		'booking_payload' => aspen_wallet_fb_to_array( $payload ),
 	) );
 
-	$debit = wallet_debit_balances( $user_id, $settings['allowed_buckets'], $settings['credit_cost'] );
+	$debit = wallet_debit_balances( $wallet_user_id, $settings['allowed_buckets'], $settings['credit_cost'] );
 	aspen_wallet_fb_debug_log( 'Wallet debit result after booking creation.', array(
 		'event_id'    => $event_id,
-		'user_id'     => $user_id,
-		'debit_result'=> is_array( $debit ) ? $debit : array( 'raw' => $debit ),
+		'booking_user_id' => $user_id,
+		'wallet_user_id'  => $wallet_user_id,
+		'debit_result'    => is_array( $debit ) ? $debit : array( 'raw' => $debit ),
 	) );
 	if ( ! empty( $debit['success'] ) ) {
 		return;
@@ -474,10 +480,11 @@ function aspen_wallet_debit_after_fluent_booking_created( $booking, $event ) {
 	do_action(
 		'aspen_wallet_booking_debit_failed',
 		array(
-			'booking_id' => aspen_wallet_fb_extract_int_field( $payload, array( 'id' ) ),
-			'event_id'   => $event_id,
-			'user_id'    => $user_id,
-			'reason'     => __( 'Wallet debit failed after booking creation.', 'aspen-wallet' ),
+			'booking_id'     => aspen_wallet_fb_extract_int_field( $payload, array( 'id' ) ),
+			'event_id'       => $event_id,
+			'user_id'        => $user_id,
+			'wallet_user_id' => $wallet_user_id,
+			'reason'         => __( 'Wallet debit failed after booking creation.', 'aspen-wallet' ),
 		)
 	);
 }
