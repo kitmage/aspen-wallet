@@ -66,7 +66,7 @@ function aspen_wallet_handle_subscription_status( $subscription, $new_status, $o
 	$new_status = sanitize_key( (string) $new_status );
 	$old_status = sanitize_key( (string) $old_status );
 
-	$terminal_statuses = array( 'cancelled', 'expired', 'on-hold', 'failed' );
+	$terminal_statuses = array( 'cancelled', 'expired', 'failed' );
 	if ( ! in_array( $new_status, $terminal_statuses, true ) ) {
 		return;
 	}
